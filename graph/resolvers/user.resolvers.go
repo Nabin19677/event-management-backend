@@ -19,7 +19,11 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser)
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	users, err := r.UserRepository.Find()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

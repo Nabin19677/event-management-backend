@@ -1,5 +1,7 @@
-[database]
-username = "John"
-password = "Doe"
-host = "localhost"
-port = 5000
+
+DATABASE_USERNAME = "John"
+DATABASE_PASSWORD = "Doe"
+DATABASE_HOST = "localhost"
+DATABASE_PORT = "5432"
+
+SERVER_PORT = "4000"
