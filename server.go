@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.io/anilk/crane/conf"
 	"github.io/anilk/crane/graph"
 	"github.io/anilk/crane/graph/resolvers"
 )
@@ -14,7 +14,9 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	port := os.Getenv("PORT")
+	conf.InitEnvConfigs()
+
+	port := conf.EnvConfigs.ServerPort
 	if port == "" {
 		port = defaultPort
 	}
