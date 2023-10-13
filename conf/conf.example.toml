@@ -1,0 +1,5 @@
+[database]
+username = "John"
+password = "Doe"
+host = "localhost"
+port = 5000
