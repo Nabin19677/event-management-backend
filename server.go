@@ -22,8 +22,9 @@ func main() {
 	db, goqu := postgres.CreateDBConnection()
 
 	userRepository := repositories.InitUserRepository(db, goqu)
+	eventRepository := repositories.InitEventRepository(db, goqu)
 
-	resolversMap := &resolvers.Resolver{UserRepository: userRepository}
+	resolversMap := &resolvers.Resolver{UserRepository: userRepository, EventRepository: eventRepository}
 
 	port := conf.EnvConfigs.ServerPort
 	if port == "" {

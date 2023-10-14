@@ -51,4 +51,5 @@ func (ur *UserRepository) Insert(newUser models.NewUser) (bool, error) {
 	}
 
 	return true, nil
+
 }

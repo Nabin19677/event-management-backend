@@ -1,0 +1,9 @@
+type Query {
+  users: [User!]
+  events: [Event!]
+}
+
+
+type Mutation {
+  createUser(input: NewUser!): Boolean!
+}
