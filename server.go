@@ -19,9 +19,9 @@ const defaultPort = "8080"
 func main() {
 	conf.InitEnvConfigs()
 
-	db := postgres.CreateDBConnection()
+	db, queryBuilder := postgres.CreateDBConnection()
 
-	userRepository := repositories.InitUserRepository(db)
+	userRepository := repositories.InitUserRepository(db, queryBuilder)
 
 	port := conf.EnvConfigs.ServerPort
 	if port == "" {
