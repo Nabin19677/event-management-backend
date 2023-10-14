@@ -1,17 +1,19 @@
 package repositories
 
 import (
+	"database/sql"
+	"log"
+
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jmoiron/sqlx"
 	"github.io/anilk/crane/models"
 )
 
 type UserRepository struct {
-	db           *sqlx.DB
+	db           *sql.DB
 	queryBuilder *goqu.Database
 }
 
-func InitUserRepository(db *sqlx.DB, queryBuilder *goqu.Database) *UserRepository {
+func InitUserRepository(db *sql.DB, queryBuilder *goqu.Database) *UserRepository {
 	return &UserRepository{db: db, queryBuilder: queryBuilder}
 }
 
@@ -27,25 +29,13 @@ func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 }
 
 func (ur *UserRepository) Find() ([]*models.User, error) {
-	query, _, _ := ur.queryBuilder.
-		From("users").Select("id", "name", "email", "phone_number").ToSQL()
-
-	rows, err := ur.db.Queryx(query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
 	var users []*models.User
 
-	for rows.Next() {
-		var user models.User
+	err := ur.queryBuilder.
+		From("users").ScanStructs(&users)
 
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.PhoneNumber)
-
-		users = append(users, &user)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return users, nil

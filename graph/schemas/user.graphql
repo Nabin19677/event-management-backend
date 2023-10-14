@@ -7,7 +7,7 @@ type User {
 }
 
 type Query {
-  users: [User!]!
+  users: [User!]
 }
 
 input NewUser {
