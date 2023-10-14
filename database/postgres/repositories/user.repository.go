@@ -22,7 +22,7 @@ func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 	var user models.User
 	_, err := ur.goqu.
 		From("users").
-		Where(goqu.Ex{"id": userID}).
+		Where(goqu.Ex{"user_id": userID}).
 		ScanStruct(&user)
 
 	return &user, err
