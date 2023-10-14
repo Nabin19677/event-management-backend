@@ -1,7 +1,2 @@
-
-DATABASE_USERNAME = "John"
-DATABASE_PASSWORD = "Doe"
-DATABASE_HOST = "localhost"
-DATABASE_PORT = "5432"
-
+DATABASE_SOURCE = "postgres://postgres:2020@localhost:5432/krane?sslmode=disable"
 SERVER_PORT = "4000"

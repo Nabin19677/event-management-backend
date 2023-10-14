@@ -7,11 +7,8 @@ import (
 )
 
 type envConfigs struct {
-	DatabaseUsername string `mapstructure:"DATABASE_USERNAME"`
-	DatabasePassword string `mapstructure:"DATABASE_PASSWORD"`
-	DatabaseHost     string `mapstructure:"DATABASE_HOST"`
-	DatabasePort     string `mapstructure:"DATABASE_PORT"`
-	ServerPort       string `mapstructure:"SERVER_PORT"`
+	DatabaseSource string `mapstructure:"DATABASE_SOURCE"`
+	ServerPort     string `mapstructure:"SERVER_PORT"`
 }
 
 var EnvConfigs *envConfigs
