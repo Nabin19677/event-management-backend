@@ -29,3 +29,16 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 
 	return events, nil
 }
+
+func (er *EventRepository) Insert(newEvent models.NewEvent) (bool, error) {
+	_, err := er.goqu.Insert("events").Rows(
+		newEvent,
+	).Executor().Exec()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return true, nil
+
+}

@@ -31,6 +31,15 @@ func (r *queryResolver) Events(ctx context.Context) ([]*models.Event, error) {
 	return events, nil
 }
 
+// CreateEvent is the resolver for the createEvent field.
+func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
+	event, err := r.EventRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	return event, nil
+}
+
 // Event returns graph.EventResolver implementation.
 func (r *Resolver) Event() graph.EventResolver { return &eventResolver{r} }
 
