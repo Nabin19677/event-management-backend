@@ -1,7 +1,7 @@
 package models
 
 type Event struct {
-	EventID     string  `json:"eventId" db:"event_id"`
+	EventID     int     `json:"eventId" db:"event_id"`
 	Name        string  `json:"name" db:"name"`
 	StartDate   *string `json:"startDate,omitempty" db:"start_date"`
 	EndDate     *string `json:"endDate,omitempty" db:"end_date"`

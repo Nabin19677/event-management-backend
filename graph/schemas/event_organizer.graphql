@@ -1,0 +1,13 @@
+
+type EventOrganizer {
+    eventOrganizerId: Int!
+    eventId: Event!
+    userId: User!
+    roleId: Int!
+}
+
+input NewEventOrganizer {
+    eventId: Int!
+    userId: Int!
+    roleId: Int!
+}

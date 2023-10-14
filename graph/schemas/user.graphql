@@ -1,6 +1,6 @@
 
 type User {
-  userId: String!
+  userId: Int!
   name: String!
   email: String
   phoneNumber: String

@@ -1,6 +1,6 @@
 
 type Event {
-    eventId: String!
+    eventId: Int!
     name: String!
     startDate: String
     endDate: String
