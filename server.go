@@ -19,16 +19,18 @@ const defaultPort = "8080"
 func main() {
 	conf.InitEnvConfigs()
 
-	db, queryBuilder := postgres.CreateDBConnection()
+	db, goqu := postgres.CreateDBConnection()
 
-	userRepository := repositories.InitUserRepository(db, queryBuilder)
+	userRepository := repositories.InitUserRepository(db, goqu)
+
+	resolversMap := &resolvers.Resolver{UserRepository: userRepository}
 
 	port := conf.EnvConfigs.ServerPort
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{UserRepository: userRepository}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolversMap}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

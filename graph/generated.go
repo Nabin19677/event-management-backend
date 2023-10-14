@@ -62,7 +62,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input models.NewUser) (*models.User, error)
+	CreateUser(ctx context.Context, input models.NewUser) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
@@ -349,9 +349,9 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.User)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -361,17 +361,7 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "phoneNumber":
-				return ec.fieldContext_User_phoneNumber(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -3091,10 +3081,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNUser2githubᚗioᚋanilkᚋcraneᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
-	return ec._User(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {

@@ -9,18 +9,18 @@ import (
 )
 
 type UserRepository struct {
-	db           *sql.DB
-	queryBuilder *goqu.Database
+	db   *sql.DB
+	goqu *goqu.Database
 }
 
-func InitUserRepository(db *sql.DB, queryBuilder *goqu.Database) *UserRepository {
-	return &UserRepository{db: db, queryBuilder: queryBuilder}
+func InitUserRepository(db *sql.DB, goqu *goqu.Database) *UserRepository {
+	return &UserRepository{db: db, goqu: goqu}
 }
 
 // FindByID retrieves a user by their ID.
 func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 	var user models.User
-	_, err := ur.queryBuilder.
+	_, err := ur.goqu.
 		From("users").
 		Where(goqu.Ex{"id": userID}).
 		ScanStruct(&user)
@@ -31,7 +31,7 @@ func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 func (ur *UserRepository) Find() ([]*models.User, error) {
 	var users []*models.User
 
-	err := ur.queryBuilder.
+	err := ur.goqu.
 		From("users").ScanStructs(&users)
 
 	if err != nil {
@@ -39,4 +39,16 @@ func (ur *UserRepository) Find() ([]*models.User, error) {
 	}
 
 	return users, nil
+}
+
+func (ur *UserRepository) Insert(newUser models.NewUser) (bool, error) {
+	_, err := ur.goqu.Insert("users").Rows(
+		newUser,
+	).Executor().Exec()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return true, nil
 }
