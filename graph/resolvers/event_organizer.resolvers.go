@@ -33,6 +33,17 @@ func (r *eventOrganizerResolver) UserID(ctx context.Context, obj *models.EventOr
 	return user, nil
 }
 
+// RoleID is the resolver for the roleId field.
+func (r *eventOrganizerResolver) RoleID(ctx context.Context, obj *models.EventOrganizer) (*models.EventRole, error) {
+	role, err := r.EventRoleRepository.FindByID(obj.RoleID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return role, nil
+}
+
 // EventOrganizer returns graph.EventOrganizerResolver implementation.
 func (r *Resolver) EventOrganizer() graph.EventOrganizerResolver { return &eventOrganizerResolver{r} }
 

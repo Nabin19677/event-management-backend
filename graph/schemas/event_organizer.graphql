@@ -3,7 +3,12 @@ type EventOrganizer {
     eventOrganizerId: Int!
     eventId: Event!
     userId: User!
+    roleId: EventRole!
+}
+
+type EventRole {
     roleId: Int!
+    roleName : String!
 }
 
 input NewEventOrganizer {

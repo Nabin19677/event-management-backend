@@ -1,5 +1,10 @@
 package models
 
+type EventRole struct {
+	RoleID   int    `json:"roleId" db:"role_id"`
+	RoleName string `json:"roleName" db:"role_name"`
+}
+
 type EventOrganizer struct {
 	EventOrganizerID int `json:"eventOrganizerId" db:"event_organizer_id"`
 	EventID          int `json:"eventId" db:"event_id"`

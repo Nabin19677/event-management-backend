@@ -2,6 +2,7 @@ type Query {
   users: [User!]
   events: [Event!]
   events_organizers: [EventOrganizer!]
+  events_roles: [EventRole!]
 }
 
 

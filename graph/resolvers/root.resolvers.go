@@ -56,6 +56,15 @@ func (r *queryResolver) EventsOrganizers(ctx context.Context) ([]*models.EventOr
 	return eventsOrganizers, nil
 }
 
+// EventsRoles is the resolver for the events_roles field.
+func (r *queryResolver) EventsRoles(ctx context.Context) ([]*models.EventRole, error) {
+	eventsRoles, err := r.EventRoleRepository.Find()
+	if err != nil {
+		return nil, err
+	}
+	return eventsRoles, nil
+}
+
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

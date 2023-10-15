@@ -24,8 +24,14 @@ func main() {
 	userRepository := repositories.InitUserRepository(db, goqu)
 	eventRepository := repositories.InitEventRepository(db, goqu)
 	eventOrganizersRepository := repositories.InitEventOrganizersRepository(db, goqu)
+	eventRoleRepository := repositories.InitEventRoleRepository(db, goqu)
 
-	resolversMap := &resolvers.Resolver{UserRepository: userRepository, EventRepository: eventRepository, EventOrganizersRepository: eventOrganizersRepository}
+	resolversMap := &resolvers.Resolver{
+		UserRepository:            userRepository,
+		EventRepository:           eventRepository,
+		EventOrganizersRepository: eventOrganizersRepository,
+		EventRoleRepository:       eventRoleRepository,
+	}
 
 	port := conf.EnvConfigs.ServerPort
 	if port == "" {
