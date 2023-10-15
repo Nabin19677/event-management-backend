@@ -22,8 +22,8 @@ func (ur *UserRepository) GetTableName() string {
 }
 
 // FindByID retrieves a user by their ID.
-func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
-	var user models.User
+func (ur *UserRepository) FindByID(userID int) (*models.PublicUser, error) {
+	var user models.PublicUser
 	_, err := ur.goqu.
 		From(ur.GetTableName()).
 		Where(goqu.Ex{"user_id": userID}).
@@ -32,8 +32,8 @@ func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 	return &user, err
 }
 
-func (ur *UserRepository) Find() ([]*models.User, error) {
-	var users []*models.User
+func (ur *UserRepository) Find() ([]*models.PublicUser, error) {
+	var users []*models.PublicUser
 
 	err := ur.goqu.
 		From(ur.GetTableName()).ScanStructs(&users)
@@ -46,6 +46,7 @@ func (ur *UserRepository) Find() ([]*models.User, error) {
 }
 
 func (ur *UserRepository) Insert(newUser models.NewUser) (bool, error) {
+	newUser.HashPassword(newUser.Password)
 	_, err := ur.goqu.Insert(ur.GetTableName()).Rows(
 		newUser,
 	).Executor().Exec()

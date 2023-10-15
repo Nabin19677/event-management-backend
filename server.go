@@ -7,11 +7,15 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.io/anilk/crane/conf"
 	"github.io/anilk/crane/database/postgres"
 	"github.io/anilk/crane/database/postgres/repositories"
 	"github.io/anilk/crane/graph"
 	"github.io/anilk/crane/graph/resolvers"
+	appMiddleware "github.io/anilk/crane/middleware"
 )
 
 const defaultPort = "8080"
@@ -37,6 +41,21 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	router := chi.NewRouter()
+
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Use "*" to allow all origins
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+		Debug:            true,
+	}).Handler
+
+	router.Use(corsHandler)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(appMiddleware.AuthMiddleware(userRepository))
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolversMap}))
 

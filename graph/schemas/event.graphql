@@ -6,7 +6,7 @@ type Event {
     endDate: String
     location: String
     description: String
-    adminUserId: User!
+    adminUserId: PublicUser!
 }
 
 input NewEvent {

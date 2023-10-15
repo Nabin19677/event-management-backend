@@ -2,7 +2,7 @@
 type EventOrganizer {
     eventOrganizerId: Int!
     eventId: Event!
-    userId: User!
+    userId: PublicUser!
     roleId: EventRole!
 }
 

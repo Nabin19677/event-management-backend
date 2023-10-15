@@ -1,5 +1,5 @@
 type Query {
-  users: [User!]
+  users: [PublicUser!]
   events: [Event!]
   events_organizers: [EventOrganizer!]
   events_roles: [EventRole!]

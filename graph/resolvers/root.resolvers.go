@@ -48,7 +48,7 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrgani
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
+func (r *queryResolver) Users(ctx context.Context) ([]*models.PublicUser, error) {
 	users, err := r.UserRepository.Find()
 	if err != nil {
 		return nil, err

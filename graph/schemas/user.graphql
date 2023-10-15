@@ -1,5 +1,5 @@
 
-type User {
+type PublicUser {
   userId: Int!
   name: String!
   email: String
@@ -10,6 +10,7 @@ input NewUser {
   name: String!
   email: String
   phoneNumber: String
+  password: String!
 }
 
 
