@@ -17,10 +17,14 @@ func InitEventRoleRepository(db *sql.DB, goqu *goqu.Database) *EventRoleReposito
 	return &EventRoleRepository{db: db, goqu: goqu}
 }
 
+func (er *EventRoleRepository) GetTableName() string {
+	return "event_roles"
+}
+
 func (er *EventRoleRepository) FindByID(roleID int) (*models.EventRole, error) {
 	var role models.EventRole
 	_, err := er.goqu.
-		From("event_roles").
+		From(er.GetTableName()).
 		Where(goqu.Ex{"role_id": roleID}).
 		ScanStruct(&role)
 
@@ -31,7 +35,7 @@ func (er *EventRoleRepository) Find() ([]*models.EventRole, error) {
 	var roles []*models.EventRole
 
 	err := er.goqu.
-		From("event_roles").ScanStructs(&roles)
+		From(er.GetTableName()).ScanStructs(&roles)
 
 	if err != nil {
 		log.Fatal(err)

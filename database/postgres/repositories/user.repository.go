@@ -17,11 +17,15 @@ func InitUserRepository(db *sql.DB, goqu *goqu.Database) *UserRepository {
 	return &UserRepository{db: db, goqu: goqu}
 }
 
+func (ur *UserRepository) GetTableName() string {
+	return "users"
+}
+
 // FindByID retrieves a user by their ID.
 func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
 	var user models.User
 	_, err := ur.goqu.
-		From("users").
+		From(ur.GetTableName()).
 		Where(goqu.Ex{"user_id": userID}).
 		ScanStruct(&user)
 
@@ -32,7 +36,7 @@ func (ur *UserRepository) Find() ([]*models.User, error) {
 	var users []*models.User
 
 	err := ur.goqu.
-		From("users").ScanStructs(&users)
+		From(ur.GetTableName()).ScanStructs(&users)
 
 	if err != nil {
 		log.Fatal(err)
@@ -42,7 +46,7 @@ func (ur *UserRepository) Find() ([]*models.User, error) {
 }
 
 func (ur *UserRepository) Insert(newUser models.NewUser) (bool, error) {
-	_, err := ur.goqu.Insert("users").Rows(
+	_, err := ur.goqu.Insert(ur.GetTableName()).Rows(
 		newUser,
 	).Executor().Exec()
 

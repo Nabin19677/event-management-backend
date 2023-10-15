@@ -17,10 +17,14 @@ func InitEventRepository(db *sql.DB, goqu *goqu.Database) *EventRepository {
 	return &EventRepository{db: db, goqu: goqu}
 }
 
+func (er *EventRepository) GetTableName() string {
+	return "events"
+}
+
 func (er *EventRepository) FindByID(eventID int) (*models.Event, error) {
 	var event models.Event
 	_, err := er.goqu.
-		From("events").
+		From(er.GetTableName()).
 		Where(goqu.Ex{"event_id": eventID}).
 		ScanStruct(&event)
 
@@ -31,7 +35,7 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 	var events []*models.Event
 
 	err := er.goqu.
-		From("events").ScanStructs(&events)
+		From(er.GetTableName()).ScanStructs(&events)
 
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +45,7 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 }
 
 func (er *EventRepository) Insert(newEvent models.NewEvent) (bool, error) {
-	_, err := er.goqu.Insert("events").Rows(
+	_, err := er.goqu.Insert(er.GetTableName()).Rows(
 		newEvent,
 	).Executor().Exec()
 

@@ -17,11 +17,15 @@ func InitEventOrganizersRepository(db *sql.DB, goqu *goqu.Database) *EventOrgani
 	return &EventOrganizersRepository{db: db, goqu: goqu}
 }
 
-func (er *EventOrganizersRepository) Find() ([]*models.EventOrganizer, error) {
+func (eor *EventOrganizersRepository) GetTableName() string {
+	return "event_organizers"
+}
+
+func (eor *EventOrganizersRepository) Find() ([]*models.EventOrganizer, error) {
 	var eventsOrganizers []*models.EventOrganizer
 
-	err := er.goqu.
-		From("event_organizers").ScanStructs(&eventsOrganizers)
+	err := eor.goqu.
+		From(eor.GetTableName()).ScanStructs(&eventsOrganizers)
 
 	if err != nil {
 		log.Fatal(err)
