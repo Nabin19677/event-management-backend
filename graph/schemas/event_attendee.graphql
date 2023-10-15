@@ -1,0 +1,11 @@
+
+type EventAttendee {
+    eventAttendeeId: Int!
+    eventId: Event
+    userId: PublicUser
+}
+
+input NewEventAttendee{
+    eventId: Int!
+    userId: Int!
+}

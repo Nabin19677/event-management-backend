@@ -15,3 +15,8 @@ type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type NewEventAttendee struct {
+	EventID int `json:"eventId"`
+	UserID  int `json:"userId"`
+}

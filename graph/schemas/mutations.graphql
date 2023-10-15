@@ -3,5 +3,6 @@ type Mutation {
   login(input: LoginInput!): AuthResponse!
   createEvent(input: NewEvent!): Boolean!
   createEventOrganizer(input: NewEventOrganizer!): Boolean!
+  createEventAttendee(input: NewEventAttendee!): Boolean!
   deleteEventOrganizer(eventOrganizerId: Int!): Boolean!
 }

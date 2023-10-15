@@ -94,6 +94,26 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input model
 	return eventOrganizerCreated, nil
 }
 
+// CreateEventAttendee is the resolver for the createEventAttendee field.
+func (r *mutationResolver) CreateEventAttendee(ctx context.Context, input models.NewEventAttendee) (bool, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
+
+	if roleId != 3 {
+		return false, errors.New("only contibutors can add/invite attendees")
+	}
+
+	_, err = r.EventAttendeeRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
 func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrganizerID int) (bool, error) {
 	isDeleted, err := r.EventOrganizersRepository.Delete(eventOrganizerID)
