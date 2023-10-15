@@ -1,11 +1,3 @@
-type Query {
-  users: [PublicUser!]
-  events: [Event!]
-  events_organizers: [EventOrganizer!]
-  events_roles: [EventRole!]
-}
-
-
 type Mutation {
   createUser(input: NewUser!): Boolean!
   createEvent(input: NewEvent!): Boolean!

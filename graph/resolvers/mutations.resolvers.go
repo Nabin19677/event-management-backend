@@ -47,47 +47,7 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrgani
 	return isDeleted, nil
 }
 
-// Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*models.PublicUser, error) {
-	users, err := r.UserRepository.Find()
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
-}
-
-// Events is the resolver for the events field.
-func (r *queryResolver) Events(ctx context.Context) ([]*models.Event, error) {
-	events, err := r.EventRepository.Find()
-	if err != nil {
-		return nil, err
-	}
-	return events, nil
-}
-
-// EventsOrganizers is the resolver for the events_organizers field.
-func (r *queryResolver) EventsOrganizers(ctx context.Context) ([]*models.EventOrganizer, error) {
-	eventsOrganizers, err := r.EventOrganizersRepository.Find()
-	if err != nil {
-		return nil, err
-	}
-	return eventsOrganizers, nil
-}
-
-// EventsRoles is the resolver for the events_roles field.
-func (r *queryResolver) EventsRoles(ctx context.Context) ([]*models.EventRole, error) {
-	eventsRoles, err := r.EventRoleRepository.Find()
-	if err != nil {
-		return nil, err
-	}
-	return eventsRoles, nil
-}
-
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 
-// Query returns graph.QueryResolver implementation.
-func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
-
 type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
