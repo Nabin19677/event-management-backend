@@ -15,5 +15,4 @@ input NewEvent {
     endDate: String
     location: String
     description: String
-    adminUserId: Int! 
 }

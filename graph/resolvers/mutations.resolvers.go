@@ -52,11 +52,25 @@ func (r *mutationResolver) Login(ctx context.Context, input models.LoginInput) (
 
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
-	event, err := r.EventRepository.Insert(input)
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+	input.AdminUserID = user.UserID
+	eventId, err := r.EventRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
-	return event, nil
+	_, err = r.EventOrganizersRepository.Insert(models.NewEventOrganizer{
+		EventID: eventId,
+		UserID:  user.UserID,
+		RoleID:  1,
+	})
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.

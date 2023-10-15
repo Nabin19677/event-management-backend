@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/doug-martin/goqu/v9"
+	_ "github.com/lib/pq"
 	"github.io/anilk/crane/models"
 )
 
@@ -44,15 +45,15 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 	return events, nil
 }
 
-func (er *EventRepository) Insert(newEvent models.NewEvent) (bool, error) {
-	_, err := er.goqu.Insert(er.GetTableName()).Rows(
-		newEvent,
-	).Executor().Exec()
+func (er *EventRepository) Insert(newEvent models.NewEvent) (int, error) {
+	query := `INSERT INTO ` + er.GetTableName() + ` (name, start_date, admin_user_id) VALUES ($1, $2, $3) RETURNING event_id`
 
+	var lastInsertID int
+	err := er.db.QueryRow(query, newEvent.Name, newEvent.StartDate, newEvent.AdminUserID).Scan(&lastInsertID)
 	if err != nil {
-		log.Fatal(err)
+		return -1, err
 	}
 
-	return true, nil
+	return lastInsertID, nil
 
 }
