@@ -46,10 +46,10 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 }
 
 func (er *EventRepository) Insert(newEvent models.NewEvent) (int, error) {
-	query := `INSERT INTO ` + er.GetTableName() + ` (name, start_date, admin_user_id) VALUES ($1, $2, $3) RETURNING event_id`
+	query := `INSERT INTO ` + er.GetTableName() + ` (name, start_date, end_date, location, description, admin_user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING event_id`
 
 	var lastInsertID int
-	err := er.db.QueryRow(query, newEvent.Name, newEvent.StartDate, newEvent.AdminUserID).Scan(&lastInsertID)
+	err := er.db.QueryRow(query, newEvent.Name, newEvent.StartDate, newEvent.EndDate, newEvent.Location, newEvent.Description, newEvent.AdminUserID).Scan(&lastInsertID)
 	if err != nil {
 		return -1, err
 	}
