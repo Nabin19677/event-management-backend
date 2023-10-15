@@ -10,4 +10,5 @@ type Mutation {
   createUser(input: NewUser!): Boolean!
   createEvent(input: NewEvent!): Boolean!
   createEventOrganizer(input: NewEventOrganizer!): Boolean!
+  deleteEventOrganizer(eventOrganizerId: Int!): Boolean!
 }

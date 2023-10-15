@@ -38,6 +38,15 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input model
 	return event, nil
 }
 
+// DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
+func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrganizerID int) (bool, error) {
+	isDeleted, err := r.EventOrganizersRepository.Delete(eventOrganizerID)
+	if err != nil {
+		return false, err
+	}
+	return isDeleted, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	users, err := r.UserRepository.Find()

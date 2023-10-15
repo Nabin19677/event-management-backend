@@ -44,5 +44,15 @@ func (eor *EventOrganizersRepository) Insert(newEventOrganizer models.NewEventOr
 	}
 
 	return true, nil
+}
 
+func (eor *EventOrganizersRepository) Delete(eventOrganizerId int) (bool, error) {
+	_, err := eor.goqu.Delete(eor.GetTableName()).Where(goqu.Ex{"event_organizer_id": eventOrganizerId}).Executor().Exec()
+
+	if err != nil {
+		log.Fatal(err)
+		return false, err
+	}
+
+	return true, nil
 }
