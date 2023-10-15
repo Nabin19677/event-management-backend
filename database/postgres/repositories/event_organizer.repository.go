@@ -33,3 +33,16 @@ func (eor *EventOrganizersRepository) Find() ([]*models.EventOrganizer, error) {
 
 	return eventsOrganizers, nil
 }
+
+func (eor *EventOrganizersRepository) Insert(newEventOrganizer models.NewEventOrganizer) (bool, error) {
+	_, err := eor.goqu.Insert(eor.GetTableName()).Rows(
+		newEventOrganizer,
+	).Executor().Exec()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return true, nil
+
+}

@@ -29,6 +29,15 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 	return event, nil
 }
 
+// CreateEventOrganizer is the resolver for the createEventOrganizer field.
+func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input models.NewEventOrganizer) (bool, error) {
+	event, err := r.EventOrganizersRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	return event, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	users, err := r.UserRepository.Find()
