@@ -13,7 +13,7 @@ import (
 
 // AdminUserID is the resolver for the adminUserId field.
 func (r *eventResolver) AdminUserID(ctx context.Context, obj *models.Event) (*models.PublicUser, error) {
-	user, err := r.UserRepository.FindByID(obj.AdminUserID)
+	user, err := r.UserRepository.FindByIDPublic(obj.AdminUserID)
 
 	if err != nil {
 		return nil, err

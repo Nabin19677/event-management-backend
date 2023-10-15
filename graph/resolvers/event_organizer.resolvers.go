@@ -24,7 +24,7 @@ func (r *eventOrganizerResolver) EventID(ctx context.Context, obj *models.EventO
 
 // UserID is the resolver for the userId field.
 func (r *eventOrganizerResolver) UserID(ctx context.Context, obj *models.EventOrganizer) (*models.PublicUser, error) {
-	user, err := r.UserRepository.FindByID(obj.UserID)
+	user, err := r.UserRepository.FindByIDPublic(obj.UserID)
 
 	if err != nil {
 		return nil, err

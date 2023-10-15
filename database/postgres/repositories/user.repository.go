@@ -22,7 +22,18 @@ func (ur *UserRepository) GetTableName() string {
 }
 
 // FindByID retrieves a user by their ID.
-func (ur *UserRepository) FindByID(userID int) (*models.PublicUser, error) {
+func (ur *UserRepository) FindByID(userID int) (*models.User, error) {
+	var user models.User
+	_, err := ur.goqu.
+		From(ur.GetTableName()).
+		Where(goqu.Ex{"user_id": userID}).
+		ScanStruct(&user)
+
+	return &user, err
+}
+
+// FindByIDPublic retrieves a user's public info
+func (ur *UserRepository) FindByIDPublic(userID int) (*models.PublicUser, error) {
 	var user models.PublicUser
 	_, err := ur.goqu.
 		From(ur.GetTableName()).
