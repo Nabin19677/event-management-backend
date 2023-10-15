@@ -4,11 +4,13 @@ go 1.21.3
 
 require (
 	github.com/99designs/gqlgen v0.17.38
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/lib/pq v1.10.9
+	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.17.0
 	github.com/vektah/gqlparser/v2 v2.5.10
 	golang.org/x/crypto v0.14.0

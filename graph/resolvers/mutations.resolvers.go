@@ -6,8 +6,11 @@ package resolvers
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/middleware"
 	"github.io/anilk/crane/models"
 )
 
@@ -31,6 +34,11 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
 func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input models.NewEventOrganizer) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
 	event, err := r.EventOrganizersRepository.Insert(input)
 	if err != nil {
 		return false, err
