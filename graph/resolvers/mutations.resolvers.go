@@ -75,16 +75,23 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
 func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input models.NewEventOrganizer) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
 	}
-	event, err := r.EventOrganizersRepository.Insert(input)
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
+
+	if roleId != 1 {
+		return false, errors.New("Only Admin Can Add Event Organizers")
+	}
+
+	eventOrganizerCreated, err := r.EventOrganizersRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
-	return event, nil
+	return eventOrganizerCreated, nil
 }
 
 // DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.

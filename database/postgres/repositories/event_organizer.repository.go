@@ -56,3 +56,13 @@ func (eor *EventOrganizersRepository) Delete(eventOrganizerId int) (bool, error)
 
 	return true, nil
 }
+
+func (eor *EventOrganizersRepository) GetEventRole(eventId int, userId int) (int, error) {
+	var eventOrganizer models.EventOrganizer
+	_, err := eor.goqu.
+		From(eor.GetTableName()).
+		Where(goqu.Ex{"user_id": userId, "event_id": eventId}).
+		ScanStruct(&eventOrganizer)
+
+	return eventOrganizer.RoleID, err
+}
