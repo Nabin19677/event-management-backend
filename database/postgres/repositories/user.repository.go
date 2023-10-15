@@ -23,13 +23,18 @@ func (ur *UserRepository) GetTableName() string {
 
 // FindByID retrieves a user by their ID.
 func (ur *UserRepository) FindByID(userID int) (*models.PublicUser, error) {
-	var user models.PublicUser
+	var user *models.PublicUser
 	_, err := ur.goqu.
 		From(ur.GetTableName()).
 		Where(goqu.Ex{"user_id": userID}).
 		ScanStruct(&user)
 
-	return &user, err
+	if err != nil {
+		log.Println("insert failed :", err)
+		return user, err
+	}
+
+	return user, err
 }
 
 func (ur *UserRepository) Find() ([]*models.PublicUser, error) {
@@ -39,7 +44,8 @@ func (ur *UserRepository) Find() ([]*models.PublicUser, error) {
 		From(ur.GetTableName()).ScanStructs(&users)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("find failed :", err)
+		return users, err
 	}
 
 	return users, nil
@@ -52,7 +58,8 @@ func (ur *UserRepository) Insert(newUser models.NewUser) (bool, error) {
 	).Executor().Exec()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("insert failed :", err)
+		return false, err
 	}
 
 	return true, nil
