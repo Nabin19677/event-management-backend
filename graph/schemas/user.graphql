@@ -13,4 +13,18 @@ input NewUser {
   password: String!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type AuthToken {
+  accessToken : String!
+  expireAt : String!
+}
+
+type AuthResponse {
+  authToken : AuthToken!
+}
+
 

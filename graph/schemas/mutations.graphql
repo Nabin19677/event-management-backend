@@ -1,5 +1,6 @@
 type Mutation {
   createUser(input: NewUser!): Boolean!
+  login(input: LoginInput!): AuthResponse!
   createEvent(input: NewEvent!): Boolean!
   createEventOrganizer(input: NewEventOrganizer!): Boolean!
   deleteEventOrganizer(eventOrganizerId: Int!): Boolean!

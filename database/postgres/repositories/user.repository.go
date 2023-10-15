@@ -32,6 +32,17 @@ func (ur *UserRepository) FindByID(userID int) (*models.PublicUser, error) {
 	return &user, err
 }
 
+// FindByEmail retrieves a user by their Email.
+func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
+	var user models.User
+	_, err := ur.goqu.
+		From(ur.GetTableName()).
+		Where(goqu.Ex{"email": email}).
+		ScanStruct(&user)
+
+	return &user, err
+}
+
 func (ur *UserRepository) Find() ([]*models.PublicUser, error) {
 	var users []*models.PublicUser
 

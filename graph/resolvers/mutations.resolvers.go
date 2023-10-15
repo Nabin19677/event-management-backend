@@ -16,11 +16,38 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (bool, error) {
-	user, err := r.UserRepository.Insert(input)
+	_, err := r.UserRepository.FindByEmail(input.Email)
+	if err == nil {
+		return false, errors.New("email already in use")
+	}
+	_, err = r.UserRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
-	return user, nil
+	return true, nil
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input models.LoginInput) (*models.AuthResponse, error) {
+	user, err := r.UserRepository.FindByEmail(input.Email)
+	if err != nil {
+		return nil, errors.New("email or password is wrong")
+	}
+
+	err = user.ComparePassword(input.Password)
+	if err != nil {
+		return nil, errors.New("email or password is wrong")
+	}
+
+	token, err := user.GenToken()
+
+	if err != nil {
+		return nil, errors.New("something went wrong")
+	}
+
+	return &models.AuthResponse{
+		AuthToken: token,
+	}, nil
 }
 
 // CreateEvent is the resolver for the createEvent field.

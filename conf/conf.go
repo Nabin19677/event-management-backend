@@ -9,6 +9,8 @@ import (
 type envConfigs struct {
 	DatabaseSource string `mapstructure:"DATABASE_SOURCE"`
 	ServerPort     string `mapstructure:"SERVER_PORT"`
+	JwtSecret      string `mapstructure:"JWT_SECRET"`
+	JwtIssuer      string `mapstructure:"JWT_ISSUER"`
 }
 
 var EnvConfigs *envConfigs

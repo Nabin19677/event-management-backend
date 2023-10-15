@@ -3,12 +3,13 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"os"
+	"strconv"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/pkg/errors"
+	"github.io/anilk/crane/conf"
 	"github.io/anilk/crane/database/postgres/repositories"
 	"github.io/anilk/crane/models"
 )
@@ -31,7 +32,10 @@ func AuthMiddleware(userRepo *repositories.UserRepository) func(http.Handler) ht
 				return
 			}
 
-			user, err := userRepo.FindByID(claims["jti"].(int))
+			jti, _ := strconv.Atoi(claims["jti"].(string))
+
+			user, err := userRepo.FindByID(jti)
+
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return
@@ -66,7 +70,7 @@ var authExtractor = &request.MultiExtractor{
 
 func parseToken(r *http.Request) (*jwt.Token, error) {
 	jwtToken, err := request.ParseFromRequest(r, authExtractor, func(token *jwt.Token) (interface{}, error) {
-		t := []byte(os.Getenv("JWT_SECRET"))
+		t := []byte(conf.EnvConfigs.JwtSecret)
 		return t, nil
 	})
 
