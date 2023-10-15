@@ -16,8 +16,8 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (bool, error) {
-	_, err := r.UserRepository.FindByEmail(input.Email)
-	if err == nil {
+	existingUser, err := r.UserRepository.FindByEmail(input.Email)
+	if existingUser != nil {
 		return false, errors.New("email already in use")
 	}
 	_, err = r.UserRepository.Insert(input)

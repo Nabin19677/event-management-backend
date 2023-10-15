@@ -50,8 +50,11 @@ func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
 		From(ur.GetTableName()).
 		Where(goqu.Ex{"email": email}).
 		ScanStruct(&user)
+	if err != nil || user.UserID == 0 {
+		return nil, err
+	}
 
-	return &user, err
+	return &user, nil
 }
 
 func (ur *UserRepository) Find() ([]*models.PublicUser, error) {
