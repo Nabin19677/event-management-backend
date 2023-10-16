@@ -164,6 +164,35 @@ func (r *mutationResolver) CreateEventSesssion(ctx context.Context, input models
 	return true, nil
 }
 
+// GetEventDetail is the resolver for the getEventDetail field.
+func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("unauthenticated")
+	}
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
+
+	if roleId != 3 {
+		return nil, errors.New("are not invited to the event")
+	}
+
+	event, err := r.EventRepository.FindByID(eventID)
+
+	sessions, err := r.EventSessionRepository.FindAllByEventId(eventID)
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("unable to find event details")
+	}
+
+	return &models.EventDetail{
+		Event:    event,
+		Sessions: sessions,
+	}, nil
+}
+
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

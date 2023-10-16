@@ -14,4 +14,7 @@ type Mutation {
 
   ## Event Session Mutations ##
   createEventSesssion(input: NewEventSession!): Boolean!
+
+  ## Event Attendee Mutations ##
+  getEventDetail(eventId: Int!): EventDetail!
 }

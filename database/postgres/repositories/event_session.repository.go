@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.io/anilk/crane/models"
@@ -18,6 +19,20 @@ func InitEventSessionRepository(db *sql.DB, goqu *goqu.Database) *EventSessionRe
 
 func (es *EventSessionRepository) GetTableName() string {
 	return "event_sessions"
+}
+
+func (es *EventSessionRepository) FindAllByEventId(eventId int) ([]*models.EventSession, error) {
+	var eventSessions []*models.EventSession
+
+	err := es.goqu.
+		From(es.GetTableName()).Where(goqu.Ex{"event_id": eventId}).ScanStructs(&eventSessions)
+
+	if err != nil {
+		log.Println("find failed :", err)
+		return eventSessions, err
+	}
+
+	return eventSessions, nil
 }
 
 func (es *EventSessionRepository) Insert(newEvent models.NewEventSession) (int, error) {

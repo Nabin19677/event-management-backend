@@ -11,6 +11,11 @@ type AuthToken struct {
 	ExpireAt    string `json:"expireAt"`
 }
 
+type EventDetail struct {
+	Event    *Event          `json:"event,omitempty"`
+	Sessions []*EventSession `json:"sessions,omitempty"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

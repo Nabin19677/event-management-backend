@@ -9,3 +9,9 @@ input NewEventAttendee{
     eventId: Int!
     userId: Int!
 }
+
+type EventDetail {
+    event: Event
+    sessions: [EventSession]
+
+}
