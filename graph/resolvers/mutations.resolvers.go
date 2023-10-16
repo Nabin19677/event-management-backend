@@ -193,6 +193,28 @@ func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*mo
 	}, nil
 }
 
+// CreateEventExpense is the resolver for the createEventExpense field.
+func (r *mutationResolver) CreateEventExpense(ctx context.Context, input models.NewEventExpense) (bool, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
+
+	if roleId != 1 {
+		return false, errors.New("cannot add event expenses")
+	}
+
+	_, err = r.EventExpenseRepository.Insert(input)
+
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

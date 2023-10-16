@@ -31,6 +31,7 @@ func main() {
 	eventRoleRepository := repositories.InitEventRoleRepository(db, goqu)
 	eventAttendeeRepository := repositories.InitEventAttendeeRepository(db, goqu)
 	eventSessionRepository := repositories.InitEventSessionRepository(db, goqu)
+	eventExpenseRepository := repositories.InitEventExpenseRepository(db, goqu)
 
 	resolversMap := &resolvers.Resolver{
 		UserRepository:            userRepository,
@@ -39,6 +40,7 @@ func main() {
 		EventRoleRepository:       eventRoleRepository,
 		EventAttendeeRepository:   eventAttendeeRepository,
 		EventSessionRepository:    eventSessionRepository,
+		EventExpenseRepository:    eventExpenseRepository,
 	}
 
 	port := conf.EnvConfigs.ServerPort

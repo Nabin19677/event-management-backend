@@ -14,4 +14,5 @@ type Resolver struct {
 	EventRoleRepository       *repositories.EventRoleRepository
 	EventAttendeeRepository   *repositories.EventAttendeeRepository
 	EventSessionRepository    *repositories.EventSessionRepository
+	EventExpenseRepository    *repositories.EventExpenseRepository
 }
