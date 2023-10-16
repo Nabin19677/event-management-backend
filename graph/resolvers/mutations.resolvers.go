@@ -75,16 +75,10 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 
 // UpdateEvent is the resolver for the updateEvent field.
 func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
-	}
-
-	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
-
-	if roleId != 1 {
-		return false, errors.New("only admin can update event")
 	}
 
 	isUpdated, err := r.EventRepository.Update(eventID, input)
@@ -95,17 +89,11 @@ func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *
 }
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
-func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input models.NewEventOrganizer) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int, input models.NewEventOrganizer) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
-	}
-
-	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
-
-	if roleId != 1 {
-		return false, errors.New("only admin can add event organizers")
 	}
 
 	eventOrganizerCreated, err := r.EventOrganizersRepository.Insert(input)
@@ -115,28 +103,14 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input model
 	return eventOrganizerCreated, nil
 }
 
-// CreateEventAttendee is the resolver for the createEventAttendee field.
-func (r *mutationResolver) CreateEventAttendee(ctx context.Context, input models.NewEventAttendee) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+// DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
+func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventID int, eventOrganizerID int) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
 	}
-	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
 
-	if roleId != 3 {
-		return false, errors.New("only contibutors can add/invite attendees")
-	}
-
-	_, err = r.EventAttendeeRepository.Insert(input)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-// DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
-func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrganizerID int) (bool, error) {
 	isDeleted, err := r.EventOrganizersRepository.Delete(eventOrganizerID)
 	if err != nil {
 		return false, err
@@ -145,16 +119,11 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrgani
 }
 
 // CreateEventSesssion is the resolver for the createEventSesssion field.
-func (r *mutationResolver) CreateEventSesssion(ctx context.Context, input models.NewEventSession) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+func (r *mutationResolver) CreateEventSesssion(ctx context.Context, eventID int, input models.NewEventSession) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
-	}
-	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
-
-	if roleId != 1 && roleId != 2 {
-		return false, errors.New("only admin/contributors can manage sessions")
 	}
 
 	_, err = r.EventSessionRepository.Insert(input)
@@ -164,18 +133,27 @@ func (r *mutationResolver) CreateEventSesssion(ctx context.Context, input models
 	return true, nil
 }
 
+// CreateEventAttendee is the resolver for the createEventAttendee field.
+func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+
+	_, err = r.EventAttendeeRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // GetEventDetail is the resolver for the getEventDetail field.
 func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("unauthenticated")
-	}
-
-	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
-
-	if roleId != 3 {
-		return nil, errors.New("are not invited to the event")
 	}
 
 	event, err := r.EventRepository.FindByID(eventID)
@@ -194,17 +172,11 @@ func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*mo
 }
 
 // CreateEventExpense is the resolver for the createEventExpense field.
-func (r *mutationResolver) CreateEventExpense(ctx context.Context, input models.NewEventExpense) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error) {
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
-	}
-
-	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
-
-	if roleId != 1 {
-		return false, errors.New("cannot add event expenses")
 	}
 
 	_, err = r.EventExpenseRepository.Insert(input)
@@ -217,16 +189,10 @@ func (r *mutationResolver) CreateEventExpense(ctx context.Context, input models.
 
 // GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
 func (r *mutationResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	_, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("unauthenticated")
-	}
-
-	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
-
-	if roleId != 1 && roleId != 2 {
-		return nil, errors.New("cannot view event expenses")
 	}
 
 	totalExpenses, err := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)

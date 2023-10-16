@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log"
 	"net/http"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
@@ -16,6 +19,7 @@ import (
 	"github.io/anilk/crane/graph"
 	"github.io/anilk/crane/graph/resolvers"
 	appMiddleware "github.io/anilk/crane/middleware"
+	"github.io/anilk/crane/models"
 )
 
 const defaultPort = "8080"
@@ -65,7 +69,32 @@ func main() {
 	router.Use(middleware.Logger)
 	router.Use(appMiddleware.AuthMiddleware(userRepository))
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolversMap}))
+	c := graph.Config{Resolvers: resolversMap}
+
+	c.Directives.RequireOrganizerRole = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []models.Role) (interface{}, error) {
+
+		eventId, ok := graphql.GetFieldContext(ctx).Args["eventId"].(int)
+
+		if !ok {
+			log.Println("field 'eventId' is required to access event organizer specific routes. please add eventId to field")
+			return nil, errors.New("unauthenticated")
+		}
+
+		user, _ := appMiddleware.GetCurrentUserFromCTX(ctx)
+
+		role, _ := eventOrganizersRepository.GetEventRole(eventId, user.UserID)
+
+		for _, requiredRole := range roles {
+			if role == requiredRole.String() {
+				// User's role matches one of the required roles
+				return next(ctx)
+			}
+		}
+
+		return nil, errors.New("unauthorized")
+	}
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)

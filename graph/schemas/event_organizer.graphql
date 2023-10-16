@@ -1,3 +1,10 @@
+directive @requireOrganizerRole(role: [Role!]!) on FIELD_DEFINITION
+
+enum Role {
+    Admin
+    Contributor
+    Attendee
+}
 
 type EventOrganizer {
     eventOrganizerId: Int!

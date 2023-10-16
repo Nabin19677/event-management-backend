@@ -5,20 +5,20 @@ type Mutation {
 
   ## Event ##
   createEvent(input: NewEvent!): Boolean!
-  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! 
+  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! @requireOrganizerRole(role: [Admin])
 
   ## Event Organizer ##
-  createEventOrganizer(input: NewEventOrganizer!): Boolean!
-  createEventAttendee(input: NewEventAttendee!): Boolean!
-  deleteEventOrganizer(eventOrganizerId: Int!): Boolean!
+  createEventOrganizer(eventId: Int!, input: NewEventOrganizer!): Boolean! @requireOrganizerRole(role: [Admin])
+  deleteEventOrganizer(eventId: Int!, eventOrganizerId: Int!): Boolean! @requireOrganizerRole(role: [Admin])
 
   ## Event Session ##
-  createEventSesssion(input: NewEventSession!): Boolean!
+  createEventSesssion(eventId: Int!, input: NewEventSession!): Boolean! @requireOrganizerRole(role: [Admin, Contributor])
 
   ## Event Attendee ##
-  getEventDetail(eventId: Int!): EventDetail!
+  createEventAttendee(eventId: Int!, input: NewEventAttendee!): Boolean! @requireOrganizerRole(role: [Contributor])
+  getEventDetail(eventId: Int!): EventDetail! @requireOrganizerRole(role: [Attendee])
 
   ## Event Expenses ##
-  createEventExpense(input: NewEventExpense!): Boolean!
-  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!
+  createEventExpense(eventId: Int!, input: NewEventExpense!): Boolean! @requireOrganizerRole(role: [Admin])
+  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]! @requireOrganizerRole(role: [Admin, Contributor])
 }
