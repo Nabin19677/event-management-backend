@@ -1,9 +1,17 @@
 type Mutation {
+  ## User Authentication ##
   createUser(input: NewUser!): Boolean!
   login(input: LoginInput!): AuthResponse!
+
+  ## Event Mutations ##
   createEvent(input: NewEvent!): Boolean!
+  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! 
+
+  ## Event Organizer Mutations ##
   createEventOrganizer(input: NewEventOrganizer!): Boolean!
   createEventAttendee(input: NewEventAttendee!): Boolean!
   deleteEventOrganizer(eventOrganizerId: Int!): Boolean!
-  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! 
+
+  ## Event Session Mutations ##
+  createEventSesssion(input: NewEventSession!): Boolean!
 }

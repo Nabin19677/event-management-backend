@@ -73,6 +73,27 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 	return true, nil
 }
 
+// UpdateEvent is the resolver for the updateEvent field.
+func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
+
+	if roleId != 1 {
+		return false, errors.New("only admin can update event")
+	}
+
+	isUpdated, err := r.EventRepository.Update(eventID, input)
+	if err != nil {
+		return false, err
+	}
+	return isUpdated, nil
+}
+
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
 func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input models.NewEventOrganizer) (bool, error) {
 	user, err := middleware.GetCurrentUserFromCTX(ctx)
@@ -123,25 +144,24 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrgani
 	return isDeleted, nil
 }
 
-// UpdateEvent is the resolver for the updateEvent field.
-func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+// CreateEventSesssion is the resolver for the createEventSesssion field.
+func (r *mutationResolver) CreateEventSesssion(ctx context.Context, input models.NewEventSession) (bool, error) {
 	user, err := middleware.GetCurrentUserFromCTX(ctx)
 	if err != nil {
 		log.Println(err)
 		return false, errors.New("unauthenticated")
 	}
+	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
 
-	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
-
-	if roleId != 1 {
-		return false, errors.New("only admin can update event")
+	if roleId != 1 && roleId != 2 {
+		return false, errors.New("only admin/contributors can manage sessions")
 	}
 
-	isUpdated, err := r.EventRepository.Update(eventID, input)
+	_, err = r.EventSessionRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
-	return isUpdated, nil
+	return true, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

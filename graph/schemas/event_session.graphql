@@ -1,0 +1,15 @@
+
+type EventSession {
+    sessionId: Int!
+    eventId: Event!
+    name: String!
+    startTime: String!
+    endTime: String!
+}
+
+input NewEventSession {
+    eventId: Int!
+    name: String!
+    startTime: String!
+    endTime: String!
+}
