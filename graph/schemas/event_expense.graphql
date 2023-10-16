@@ -14,7 +14,7 @@ type EventExpenseCategory {
 }
 
 type CategoryTotal {
-  category: EventExpenseCategory!
+  categoryName: String!
   totalCost: Float!
 }
 

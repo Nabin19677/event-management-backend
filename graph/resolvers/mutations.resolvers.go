@@ -229,7 +229,9 @@ func (r *mutationResolver) GetEventExpensesByCategory(ctx context.Context, event
 		return nil, errors.New("cannot view event expenses")
 	}
 
-	return nil, nil
+	totalExpenses, err := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)
+
+	return totalExpenses, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

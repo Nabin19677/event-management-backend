@@ -33,6 +33,29 @@ func (er *EventExpenseRepository) Insert(newEvent models.NewEventExpense) (int, 
 }
 
 func (er *EventExpenseRepository) GetTotalExpensesByCategory(eventId int) ([]*models.CategoryTotal, error) {
+	// Create a Goqu instance for the expenses table
+	expensesTable := er.goqu.From("expenses").Select(
+		goqu.I("category_id").As("category_id"),
+		goqu.I("cost").As("cost"),
+	).Where(
+		goqu.C("event_id").Eq(eventId),
+	)
 
-	return nil, nil
+	// Join with event_expense_categories to get category names
+	query := expensesTable.LeftJoin(
+		goqu.T("event_expense_categories"),
+		goqu.On(goqu.I("expenses.category_id").Eq(goqu.I("event_expense_categories.category_id"))),
+	).Select(
+		goqu.I("event_expense_categories.category_name").As("category_name"),
+		goqu.SUM(goqu.I("cost")).As("total_cost"),
+	).GroupBy("category_name")
+
+	// Execute the query and retrieve the results
+	var results []*models.CategoryTotal
+	err := query.ScanStructs(&results)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

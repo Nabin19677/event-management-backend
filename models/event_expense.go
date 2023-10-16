@@ -13,3 +13,8 @@ type EventExpenseCategory struct {
 	CategoryID   int    `json:"categoryId" db:"category_id"`
 	CategoryName string `json:"categoryName" db:"category_name"`
 }
+
+type CategoryTotal struct {
+	CategoryName string  `json:"categoryName" db:"category_name"`
+	TotalCost    float64 `json:"totalCost"  db:"total_cost"`
+}
