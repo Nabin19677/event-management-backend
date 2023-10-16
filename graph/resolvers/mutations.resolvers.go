@@ -84,7 +84,7 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, input model
 	roleId, err := r.EventOrganizersRepository.GetEventRole(input.EventID, user.UserID)
 
 	if roleId != 1 {
-		return false, errors.New("Only Admin Can Add Event Organizers")
+		return false, errors.New("only admin can add event organizers")
 	}
 
 	eventOrganizerCreated, err := r.EventOrganizersRepository.Insert(input)
@@ -121,6 +121,27 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventOrgani
 		return false, err
 	}
 	return isDeleted, nil
+}
+
+// UpdateEvent is the resolver for the updateEvent field.
+func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, errors.New("unauthenticated")
+	}
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
+
+	if roleId != 1 {
+		return false, errors.New("only admin can update event")
+	}
+
+	isUpdated, err := r.EventRepository.Update(eventID, input)
+	if err != nil {
+		return false, err
+	}
+	return isUpdated, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

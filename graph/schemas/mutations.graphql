@@ -5,4 +5,5 @@ type Mutation {
   createEventOrganizer(input: NewEventOrganizer!): Boolean!
   createEventAttendee(input: NewEventAttendee!): Boolean!
   deleteEventOrganizer(eventOrganizerId: Int!): Boolean!
+  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! 
 }

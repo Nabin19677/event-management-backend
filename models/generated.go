@@ -20,3 +20,10 @@ type NewEventAttendee struct {
 	EventID int `json:"eventId"`
 	UserID  int `json:"userId"`
 }
+
+type UpdateEvent struct {
+	StartDate   *string `json:"startDate,omitempty"`
+	EndDate     *string `json:"endDate,omitempty"`
+	Location    *string `json:"location,omitempty"`
+	Description *string `json:"description,omitempty"`
+}

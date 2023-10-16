@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/doug-martin/goqu/v9"
@@ -56,4 +57,24 @@ func (er *EventRepository) Insert(newEvent models.NewEvent) (int, error) {
 
 	return lastInsertID, nil
 
+}
+
+func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent) (bool, error) {
+	ds := goqu.Update(er.GetTableName()).Set(
+		goqu.Record{
+			"start_date":  updatedEvent.StartDate,
+			"end_date":    updatedEvent.EndDate,
+			"location":    updatedEvent.Location,
+			"description": updatedEvent.Description,
+		},
+	)
+	updateSQL, _, _ := ds.ToSQL()
+
+	_, err := er.db.Query(updateSQL)
+
+	if err != nil {
+		return false, errors.New("update event failed")
+	}
+
+	return true, err
 }
