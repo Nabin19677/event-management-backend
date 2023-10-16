@@ -52,11 +52,7 @@ func (r *mutationResolver) Login(ctx context.Context, input models.LoginInput) (
 
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
-	user, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
+	user, _ := middleware.GetCurrentUserFromCTX(ctx)
 	input.AdminUserID = user.UserID
 	eventId, err := r.EventRepository.Insert(input)
 	if err != nil {
@@ -75,12 +71,6 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 
 // UpdateEvent is the resolver for the updateEvent field.
 func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
 	isUpdated, err := r.EventRepository.Update(eventID, input)
 	if err != nil {
 		return false, err
@@ -90,12 +80,6 @@ func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
 func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int, input models.NewEventOrganizer) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
 	eventOrganizerCreated, err := r.EventOrganizersRepository.Insert(input)
 	if err != nil {
 		return false, err
@@ -105,12 +89,6 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int
 
 // DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
 func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventID int, eventOrganizerID int) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
 	isDeleted, err := r.EventOrganizersRepository.Delete(eventOrganizerID)
 	if err != nil {
 		return false, err
@@ -120,13 +98,7 @@ func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventID int
 
 // CreateEventSesssion is the resolver for the createEventSesssion field.
 func (r *mutationResolver) CreateEventSesssion(ctx context.Context, eventID int, input models.NewEventSession) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
-	_, err = r.EventSessionRepository.Insert(input)
+	_, err := r.EventSessionRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
@@ -135,13 +107,7 @@ func (r *mutationResolver) CreateEventSesssion(ctx context.Context, eventID int,
 
 // CreateEventAttendee is the resolver for the createEventAttendee field.
 func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
-	_, err = r.EventAttendeeRepository.Insert(input)
+	_, err := r.EventAttendeeRepository.Insert(input)
 	if err != nil {
 		return false, err
 	}
@@ -150,12 +116,6 @@ func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int,
 
 // GetEventDetail is the resolver for the getEventDetail field.
 func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("unauthenticated")
-	}
-
 	event, err := r.EventRepository.FindByID(eventID)
 
 	sessions, err := r.EventSessionRepository.FindAllByEventId(eventID)
@@ -173,13 +133,7 @@ func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*mo
 
 // CreateEventExpense is the resolver for the createEventExpense field.
 func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return false, errors.New("unauthenticated")
-	}
-
-	_, err = r.EventExpenseRepository.Insert(input)
+	_, err := r.EventExpenseRepository.Insert(input)
 
 	if err != nil {
 		return false, err
@@ -189,13 +143,7 @@ func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, 
 
 // GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
 func (r *mutationResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
-	_, err := middleware.GetCurrentUserFromCTX(ctx)
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("unauthenticated")
-	}
-
-	totalExpenses, err := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)
+	totalExpenses, _ := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)
 
 	return totalExpenses, nil
 }

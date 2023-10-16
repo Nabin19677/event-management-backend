@@ -71,6 +71,15 @@ func main() {
 
 	c := graph.Config{Resolvers: resolversMap}
 
+	c.Directives.Authenticate = func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+		_, err = appMiddleware.GetCurrentUserFromCTX(ctx)
+		if err != nil {
+			log.Println(err)
+			return false, errors.New("unauthenticated")
+		}
+		return next(ctx)
+	}
+
 	c.Directives.RequireOrganizerRole = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []models.Role) (interface{}, error) {
 
 		eventId, ok := graphql.GetFieldContext(ctx).Args["eventId"].(int)

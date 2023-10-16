@@ -4,21 +4,21 @@ type Mutation {
   login(input: LoginInput!): AuthResponse!
 
   ## Event ##
-  createEvent(input: NewEvent!): Boolean!
-  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! @requireOrganizerRole(role: [Admin])
+  createEvent(input: NewEvent!): Boolean!  @authenticate
+  updateEvent(eventId: Int!, input: UpdateEvent): Boolean! @authenticate @requireOrganizerRole(role: [Admin])
 
   ## Event Organizer ##
-  createEventOrganizer(eventId: Int!, input: NewEventOrganizer!): Boolean! @requireOrganizerRole(role: [Admin])
-  deleteEventOrganizer(eventId: Int!, eventOrganizerId: Int!): Boolean! @requireOrganizerRole(role: [Admin])
+  createEventOrganizer(eventId: Int!, input: NewEventOrganizer!): Boolean!  @authenticate @requireOrganizerRole(role: [Admin])
+  deleteEventOrganizer(eventId: Int!, eventOrganizerId: Int!): Boolean!  @authenticate @requireOrganizerRole(role: [Admin])
 
   ## Event Session ##
-  createEventSesssion(eventId: Int!, input: NewEventSession!): Boolean! @requireOrganizerRole(role: [Admin, Contributor])
+  createEventSesssion(eventId: Int!, input: NewEventSession!): Boolean!  @authenticate @requireOrganizerRole(role: [Admin, Contributor])
 
   ## Event Attendee ##
-  createEventAttendee(eventId: Int!, input: NewEventAttendee!): Boolean! @requireOrganizerRole(role: [Contributor])
-  getEventDetail(eventId: Int!): EventDetail! @requireOrganizerRole(role: [Attendee])
+  createEventAttendee(eventId: Int!, input: NewEventAttendee!): Boolean!  @authenticate @requireOrganizerRole(role: [Contributor])
+  getEventDetail(eventId: Int!): EventDetail!  @authenticate @requireOrganizerRole(role: [Attendee])
 
   ## Event Expenses ##
-  createEventExpense(eventId: Int!, input: NewEventExpense!): Boolean! @requireOrganizerRole(role: [Admin])
-  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]! @requireOrganizerRole(role: [Admin, Contributor])
+  createEventExpense(eventId: Int!, input: NewEventExpense!): Boolean!  @authenticate @requireOrganizerRole(role: [Admin])
+  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!  @authenticate @requireOrganizerRole(role: [Admin, Contributor])
 }

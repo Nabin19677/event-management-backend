@@ -47,6 +47,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Authenticate         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	RequireOrganizerRole func(ctx context.Context, obj interface{}, next graphql.Resolver, role []models.Role) (res interface{}, err error)
 }
 
@@ -2886,8 +2887,28 @@ func (ec *executionContext) _Mutation_createEvent(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateEvent(rctx, fc.Args["input"].(models.NewEvent))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateEvent(rctx, fc.Args["input"].(models.NewEvent))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2946,6 +2967,12 @@ func (ec *executionContext) _Mutation_updateEvent(ctx context.Context, field gra
 			return ec.resolvers.Mutation().UpdateEvent(rctx, fc.Args["eventId"].(int), fc.Args["input"].(*models.UpdateEvent))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
 			if err != nil {
 				return nil, err
@@ -2953,10 +2980,10 @@ func (ec *executionContext) _Mutation_updateEvent(ctx context.Context, field gra
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3025,6 +3052,12 @@ func (ec *executionContext) _Mutation_createEventOrganizer(ctx context.Context, 
 			return ec.resolvers.Mutation().CreateEventOrganizer(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventOrganizer))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
 			if err != nil {
 				return nil, err
@@ -3032,10 +3065,10 @@ func (ec *executionContext) _Mutation_createEventOrganizer(ctx context.Context, 
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3104,6 +3137,12 @@ func (ec *executionContext) _Mutation_deleteEventOrganizer(ctx context.Context, 
 			return ec.resolvers.Mutation().DeleteEventOrganizer(rctx, fc.Args["eventId"].(int), fc.Args["eventOrganizerId"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
 			if err != nil {
 				return nil, err
@@ -3111,10 +3150,10 @@ func (ec *executionContext) _Mutation_deleteEventOrganizer(ctx context.Context, 
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3183,6 +3222,12 @@ func (ec *executionContext) _Mutation_createEventSesssion(ctx context.Context, f
 			return ec.resolvers.Mutation().CreateEventSesssion(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventSession))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Contributor"})
 			if err != nil {
 				return nil, err
@@ -3190,10 +3235,10 @@ func (ec *executionContext) _Mutation_createEventSesssion(ctx context.Context, f
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3262,6 +3307,12 @@ func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, f
 			return ec.resolvers.Mutation().CreateEventAttendee(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventAttendee))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Contributor"})
 			if err != nil {
 				return nil, err
@@ -3269,10 +3320,10 @@ func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, f
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3341,6 +3392,12 @@ func (ec *executionContext) _Mutation_getEventDetail(ctx context.Context, field 
 			return ec.resolvers.Mutation().GetEventDetail(rctx, fc.Args["eventId"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Attendee"})
 			if err != nil {
 				return nil, err
@@ -3348,10 +3405,10 @@ func (ec *executionContext) _Mutation_getEventDetail(ctx context.Context, field 
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3426,6 +3483,12 @@ func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, fi
 			return ec.resolvers.Mutation().CreateEventExpense(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventExpense))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
 			if err != nil {
 				return nil, err
@@ -3433,10 +3496,10 @@ func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, fi
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -3505,6 +3568,12 @@ func (ec *executionContext) _Mutation_getEventExpensesByCategory(ctx context.Con
 			return ec.resolvers.Mutation().GetEventExpensesByCategory(rctx, fc.Args["eventId"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive0)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Contributor"})
 			if err != nil {
 				return nil, err
@@ -3512,10 +3581,10 @@ func (ec *executionContext) _Mutation_getEventExpensesByCategory(ctx context.Con
 			if ec.directives.RequireOrganizerRole == nil {
 				return nil, errors.New("directive requireOrganizerRole is not implemented")
 			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive1, role)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
