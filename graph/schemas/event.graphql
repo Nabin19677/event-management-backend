@@ -18,8 +18,8 @@ input NewEvent {
 }
 
 input UpdateEvent {
-    startDate: String
-    endDate: String
-    location: String
-    description: String
+    startDate: String!
+    endDate: String!
+    location: String!
+    description: String!
 }

@@ -22,8 +22,8 @@ type NewEventAttendee struct {
 }
 
 type UpdateEvent struct {
-	StartDate   *string `json:"startDate,omitempty"`
-	EndDate     *string `json:"endDate,omitempty"`
-	Location    *string `json:"location,omitempty"`
-	Description *string `json:"description,omitempty"`
+	StartDate   string `json:"startDate"`
+	EndDate     string `json:"endDate"`
+	Location    string `json:"location"`
+	Description string `json:"description"`
 }
