@@ -11,6 +11,11 @@ type AuthToken struct {
 	ExpireAt    string `json:"expireAt"`
 }
 
+type CategoryTotal struct {
+	Category  *EventExpenseCategory `json:"category"`
+	TotalCost float64               `json:"totalCost"`
+}
+
 type EventDetail struct {
 	Event    *Event          `json:"event,omitempty"`
 	Sessions []*EventSession `json:"sessions,omitempty"`

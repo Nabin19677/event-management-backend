@@ -215,6 +215,23 @@ func (r *mutationResolver) CreateEventExpense(ctx context.Context, input models.
 	return true, nil
 }
 
+// GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
+func (r *mutationResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
+	user, err := middleware.GetCurrentUserFromCTX(ctx)
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("unauthenticated")
+	}
+
+	roleId, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
+
+	if roleId != 1 && roleId != 2 {
+		return nil, errors.New("cannot view event expenses")
+	}
+
+	return nil, nil
+}
+
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

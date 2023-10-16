@@ -20,4 +20,5 @@ type Mutation {
 
   ## Event Expenses ##
   createEventExpense(input: NewEventExpense!): Boolean!
+  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!
 }

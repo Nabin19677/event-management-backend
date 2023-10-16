@@ -59,6 +59,11 @@ type ComplexityRoot struct {
 		ExpireAt    func(childComplexity int) int
 	}
 
+	CategoryTotal struct {
+		Category  func(childComplexity int) int
+		TotalCost func(childComplexity int) int
+	}
+
 	Event struct {
 		AdminUserID func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -89,6 +94,11 @@ type ComplexityRoot struct {
 		ItemName    func(childComplexity int) int
 	}
 
+	EventExpenseCategory struct {
+		CategoryID   func(childComplexity int) int
+		CategoryName func(childComplexity int) int
+	}
+
 	EventOrganizer struct {
 		EventID          func(childComplexity int) int
 		EventOrganizerID func(childComplexity int) int
@@ -110,16 +120,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateEvent          func(childComplexity int, input models.NewEvent) int
-		CreateEventAttendee  func(childComplexity int, input models.NewEventAttendee) int
-		CreateEventExpense   func(childComplexity int, input models.NewEventExpense) int
-		CreateEventOrganizer func(childComplexity int, input models.NewEventOrganizer) int
-		CreateEventSesssion  func(childComplexity int, input models.NewEventSession) int
-		CreateUser           func(childComplexity int, input models.NewUser) int
-		DeleteEventOrganizer func(childComplexity int, eventOrganizerID int) int
-		GetEventDetail       func(childComplexity int, eventID int) int
-		Login                func(childComplexity int, input models.LoginInput) int
-		UpdateEvent          func(childComplexity int, eventID int, input *models.UpdateEvent) int
+		CreateEvent                func(childComplexity int, input models.NewEvent) int
+		CreateEventAttendee        func(childComplexity int, input models.NewEventAttendee) int
+		CreateEventExpense         func(childComplexity int, input models.NewEventExpense) int
+		CreateEventOrganizer       func(childComplexity int, input models.NewEventOrganizer) int
+		CreateEventSesssion        func(childComplexity int, input models.NewEventSession) int
+		CreateUser                 func(childComplexity int, input models.NewUser) int
+		DeleteEventOrganizer       func(childComplexity int, eventOrganizerID int) int
+		GetEventDetail             func(childComplexity int, eventID int) int
+		GetEventExpensesByCategory func(childComplexity int, eventID int) int
+		Login                      func(childComplexity int, input models.LoginInput) int
+		UpdateEvent                func(childComplexity int, eventID int, input *models.UpdateEvent) int
 	}
 
 	PublicUser struct {
@@ -166,6 +177,7 @@ type MutationResolver interface {
 	CreateEventSesssion(ctx context.Context, input models.NewEventSession) (bool, error)
 	GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error)
 	CreateEventExpense(ctx context.Context, input models.NewEventExpense) (bool, error)
+	GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.PublicUser, error)
@@ -209,6 +221,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthToken.ExpireAt(childComplexity), true
+
+	case "CategoryTotal.category":
+		if e.complexity.CategoryTotal.Category == nil {
+			break
+		}
+
+		return e.complexity.CategoryTotal.Category(childComplexity), true
+
+	case "CategoryTotal.totalCost":
+		if e.complexity.CategoryTotal.TotalCost == nil {
+			break
+		}
+
+		return e.complexity.CategoryTotal.TotalCost(childComplexity), true
 
 	case "Event.adminUserId":
 		if e.complexity.Event.AdminUserID == nil {
@@ -335,6 +361,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EventExpense.ItemName(childComplexity), true
+
+	case "EventExpenseCategory.categoryId":
+		if e.complexity.EventExpenseCategory.CategoryID == nil {
+			break
+		}
+
+		return e.complexity.EventExpenseCategory.CategoryID(childComplexity), true
+
+	case "EventExpenseCategory.categoryName":
+		if e.complexity.EventExpenseCategory.CategoryName == nil {
+			break
+		}
+
+		return e.complexity.EventExpenseCategory.CategoryName(childComplexity), true
 
 	case "EventOrganizer.eventId":
 		if e.complexity.EventOrganizer.EventID == nil {
@@ -508,6 +548,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.GetEventDetail(childComplexity, args["eventId"].(int)), true
+
+	case "Mutation.getEventExpensesByCategory":
+		if e.complexity.Mutation.GetEventExpensesByCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_getEventExpensesByCategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GetEventExpensesByCategory(childComplexity, args["eventId"].(int)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -848,6 +900,21 @@ func (ec *executionContext) field_Mutation_getEventDetail_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_getEventExpensesByCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["eventId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventId"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["eventId"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1073,6 +1140,100 @@ func (ec *executionContext) fieldContext_AuthToken_expireAt(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CategoryTotal_category(ctx context.Context, field graphql.CollectedField, obj *models.CategoryTotal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CategoryTotal_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.EventExpenseCategory)
+	fc.Result = res
+	return ec.marshalNEventExpenseCategory2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CategoryTotal_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CategoryTotal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "categoryId":
+				return ec.fieldContext_EventExpenseCategory_categoryId(ctx, field)
+			case "categoryName":
+				return ec.fieldContext_EventExpenseCategory_categoryName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventExpenseCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CategoryTotal_totalCost(ctx context.Context, field graphql.CollectedField, obj *models.CategoryTotal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CategoryTotal_totalCost(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CategoryTotal_totalCost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CategoryTotal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1918,6 +2079,94 @@ func (ec *executionContext) fieldContext_EventExpense_categoryId(ctx context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventExpenseCategory_categoryId(ctx context.Context, field graphql.CollectedField, obj *models.EventExpenseCategory) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventExpenseCategory_categoryId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CategoryID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventExpenseCategory_categoryId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventExpenseCategory",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventExpenseCategory_categoryName(ctx context.Context, field graphql.CollectedField, obj *models.EventExpenseCategory) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EventExpenseCategory_categoryName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CategoryName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EventExpenseCategory_categoryName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventExpenseCategory",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3009,6 +3258,67 @@ func (ec *executionContext) fieldContext_Mutation_createEventExpense(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createEventExpense_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_getEventExpensesByCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_getEventExpensesByCategory(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GetEventExpensesByCategory(rctx, fc.Args["eventId"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.CategoryTotal)
+	fc.Result = res
+	return ec.marshalNCategoryTotal2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐCategoryTotalᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_getEventExpensesByCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "category":
+				return ec.fieldContext_CategoryTotal_category(ctx, field)
+			case "totalCost":
+				return ec.fieldContext_CategoryTotal_totalCost(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CategoryTotal", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_getEventExpensesByCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5805,6 +6115,50 @@ func (ec *executionContext) _AuthToken(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var categoryTotalImplementors = []string{"CategoryTotal"}
+
+func (ec *executionContext) _CategoryTotal(ctx context.Context, sel ast.SelectionSet, obj *models.CategoryTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, categoryTotalImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CategoryTotal")
+		case "category":
+			out.Values[i] = ec._CategoryTotal_category(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCost":
+			out.Values[i] = ec._CategoryTotal_totalCost(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var eventImplementors = []string{"Event"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *models.Event) graphql.Marshaler {
@@ -6104,6 +6458,50 @@ func (ec *executionContext) _EventExpense(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._EventExpense_categoryId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var eventExpenseCategoryImplementors = []string{"EventExpenseCategory"}
+
+func (ec *executionContext) _EventExpenseCategory(ctx context.Context, sel ast.SelectionSet, obj *models.EventExpenseCategory) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, eventExpenseCategoryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EventExpenseCategory")
+		case "categoryId":
+			out.Values[i] = ec._EventExpenseCategory_categoryId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "categoryName":
+			out.Values[i] = ec._EventExpenseCategory_categoryName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6494,6 +6892,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createEventExpense":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createEventExpense(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "getEventExpensesByCategory":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_getEventExpensesByCategory(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -7060,6 +7465,60 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCategoryTotal2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐCategoryTotalᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.CategoryTotal) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCategoryTotal2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐCategoryTotal(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCategoryTotal2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐCategoryTotal(ctx context.Context, sel ast.SelectionSet, v *models.CategoryTotal) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CategoryTotal(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNEvent2githubᚗioᚋanilkᚋcraneᚋmodelsᚐEvent(ctx context.Context, sel ast.SelectionSet, v models.Event) graphql.Marshaler {
 	return ec._Event(ctx, sel, &v)
 }
@@ -7086,6 +7545,16 @@ func (ec *executionContext) marshalNEventDetail2ᚖgithubᚗioᚋanilkᚋcrane�
 		return graphql.Null
 	}
 	return ec._EventDetail(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEventExpenseCategory2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategory(ctx context.Context, sel ast.SelectionSet, v *models.EventExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EventExpenseCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNEventOrganizer2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventOrganizer(ctx context.Context, sel ast.SelectionSet, v *models.EventOrganizer) graphql.Marshaler {

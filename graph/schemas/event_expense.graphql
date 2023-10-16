@@ -8,6 +8,16 @@ type EventExpense {
     categoryId: Int!
 }
 
+type EventExpenseCategory {
+  categoryId: Int!
+  categoryName: String!
+}
+
+type CategoryTotal {
+  category: EventExpenseCategory!
+  totalCost: Float!
+}
+
 input NewEventExpense{
     eventId: Int!
     itemName: String!

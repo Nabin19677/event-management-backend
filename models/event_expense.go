@@ -8,3 +8,8 @@ type EventExpense struct {
 	Description string  `json:"description" db:"description"`
 	CategoryID  int     `json:"categoryId" db:"category_id"`
 }
+
+type EventExpenseCategory struct {
+	CategoryID   int    `json:"categoryId" db:"category_id"`
+	CategoryName string `json:"categoryName" db:"category_name"`
+}

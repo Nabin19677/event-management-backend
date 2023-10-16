@@ -8,11 +8,12 @@ import "github.io/anilk/crane/database/postgres/repositories"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	UserRepository            *repositories.UserRepository
-	EventRepository           *repositories.EventRepository
-	EventOrganizersRepository *repositories.EventOrganizersRepository
-	EventRoleRepository       *repositories.EventRoleRepository
-	EventAttendeeRepository   *repositories.EventAttendeeRepository
-	EventSessionRepository    *repositories.EventSessionRepository
-	EventExpenseRepository    *repositories.EventExpenseRepository
+	UserRepository                 *repositories.UserRepository
+	EventRepository                *repositories.EventRepository
+	EventOrganizersRepository      *repositories.EventOrganizersRepository
+	EventRoleRepository            *repositories.EventRoleRepository
+	EventAttendeeRepository        *repositories.EventAttendeeRepository
+	EventSessionRepository         *repositories.EventSessionRepository
+	EventExpenseRepository         *repositories.EventExpenseRepository
+	EventExpenseCategoryRepository *repositories.EventExpenseCategoryRepository
 }

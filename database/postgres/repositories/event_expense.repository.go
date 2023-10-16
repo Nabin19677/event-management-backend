@@ -30,5 +30,9 @@ func (er *EventExpenseRepository) Insert(newEvent models.NewEventExpense) (int, 
 	}
 
 	return lastInsertID, nil
+}
 
+func (er *EventExpenseRepository) GetTotalExpensesByCategory(eventId int) ([]*models.CategoryTotal, error) {
+
+	return nil, nil
 }

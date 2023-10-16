@@ -32,15 +32,17 @@ func main() {
 	eventAttendeeRepository := repositories.InitEventAttendeeRepository(db, goqu)
 	eventSessionRepository := repositories.InitEventSessionRepository(db, goqu)
 	eventExpenseRepository := repositories.InitEventExpenseRepository(db, goqu)
+	eventExpenseCategoryRepository := repositories.InitEventExpenseCategoryRepository(db, goqu)
 
 	resolversMap := &resolvers.Resolver{
-		UserRepository:            userRepository,
-		EventRepository:           eventRepository,
-		EventOrganizersRepository: eventOrganizersRepository,
-		EventRoleRepository:       eventRoleRepository,
-		EventAttendeeRepository:   eventAttendeeRepository,
-		EventSessionRepository:    eventSessionRepository,
-		EventExpenseRepository:    eventExpenseRepository,
+		UserRepository:                 userRepository,
+		EventRepository:                eventRepository,
+		EventOrganizersRepository:      eventOrganizersRepository,
+		EventRoleRepository:            eventRoleRepository,
+		EventAttendeeRepository:        eventAttendeeRepository,
+		EventSessionRepository:         eventSessionRepository,
+		EventExpenseRepository:         eventExpenseRepository,
+		EventExpenseCategoryRepository: eventExpenseCategoryRepository,
 	}
 
 	port := conf.EnvConfigs.ServerPort
