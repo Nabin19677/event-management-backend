@@ -7,7 +7,6 @@ package resolvers
 import (
 	"context"
 	"errors"
-	"log"
 
 	"github.io/anilk/crane/graph"
 	"github.io/anilk/crane/middleware"
@@ -114,23 +113,6 @@ func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int,
 	return true, nil
 }
 
-// GetEventDetail is the resolver for the getEventDetail field.
-func (r *mutationResolver) GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error) {
-	event, err := r.EventRepository.FindByID(eventID)
-
-	sessions, err := r.EventSessionRepository.FindAllByEventId(eventID)
-
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("unable to find event details")
-	}
-
-	return &models.EventDetail{
-		Event:    event,
-		Sessions: sessions,
-	}, nil
-}
-
 // CreateEventExpense is the resolver for the createEventExpense field.
 func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error) {
 	_, err := r.EventExpenseRepository.Insert(input)
@@ -139,13 +121,6 @@ func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, 
 		return false, err
 	}
 	return true, nil
-}
-
-// GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
-func (r *mutationResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
-	totalExpenses, _ := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)
-
-	return totalExpenses, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

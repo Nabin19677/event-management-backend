@@ -20,6 +20,7 @@ type AuthToken struct {
 type EventDetail struct {
 	Event    *Event          `json:"event,omitempty"`
 	Sessions []*EventSession `json:"sessions,omitempty"`
+	Role     *string         `json:"role,omitempty"`
 }
 
 type LoginInput struct {

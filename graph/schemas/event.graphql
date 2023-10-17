@@ -23,3 +23,10 @@ input UpdateEvent {
     location: String!
     description: String!
 }
+
+type EventDetail {
+    event: Event
+    sessions: [EventSession]
+    role: String
+}
+

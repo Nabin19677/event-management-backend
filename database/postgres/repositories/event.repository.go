@@ -78,3 +78,16 @@ func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent)
 
 	return true, err
 }
+
+func (er *EventRepository) FindByOrganizerId(userId int) ([]*models.Event, error) {
+	var events []*models.Event
+
+	err := er.goqu.
+		From(er.GetTableName()).ScanStructs(&events)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return events, nil
+}

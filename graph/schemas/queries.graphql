@@ -3,4 +3,8 @@ type Query {
   events: [Event!]
   events_organizers: [EventOrganizer!]
   events_roles: [EventRole!]
+  organized_events: [Event!]  @authenticate
+
+  getEventDetail(eventId: Int!): EventDetail! @requireOrganizerRole(role: [Admin, Attendee]) @authenticate
+  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!  @requireOrganizerRole(role: [Admin, Contributor]) @authenticate
 }

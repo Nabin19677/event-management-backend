@@ -16,9 +16,7 @@ type Mutation {
 
   ## Event Attendee ##
   createEventAttendee(eventId: Int!, input: NewEventAttendee!): Boolean! @requireOrganizerRole(role: [Contributor]) @authenticate
-  getEventDetail(eventId: Int!): EventDetail! @requireOrganizerRole(role: [Attendee]) @authenticate
 
   ## Event Expenses ##
   createEventExpense(eventId: Int!, input: NewEventExpense!): Boolean!  @requireOrganizerRole(role: [Admin]) @authenticate
-  getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!  @requireOrganizerRole(role: [Admin, Contributor]) @authenticate
 }
