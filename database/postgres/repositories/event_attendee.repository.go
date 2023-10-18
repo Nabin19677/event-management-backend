@@ -32,3 +32,17 @@ func (ea *EventAttendeeRepository) Insert(newEvent models.NewEventAttendee) (int
 	return lastInsertID, nil
 
 }
+
+func (ea *EventAttendeeRepository) FindByEventAndUserId(eventId int, userId int) (*models.EventAttendee, error) {
+	var eventAttendee models.EventAttendee
+	_, err := ea.goqu.
+		From(ea.GetTableName()).
+		Where(goqu.Ex{"event_id": eventId, "user_id": userId}).
+		ScanStruct(&eventAttendee)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &eventAttendee, err
+}

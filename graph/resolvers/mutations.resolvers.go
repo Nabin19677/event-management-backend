@@ -83,6 +83,17 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int
 	if err != nil {
 		return false, err
 	}
+	// Check If Role Attendee
+	if input.RoleID == 3 {
+		_, err := r.EventAttendeeRepository.Insert(models.NewEventAttendee{
+			EventID: eventID,
+			UserID:  input.UserID,
+		})
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
 	return eventOrganizerCreated, nil
 }
 

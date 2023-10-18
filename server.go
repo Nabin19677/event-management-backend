@@ -70,7 +70,7 @@ func main() {
 
 	c.Directives.Authenticate = directives.Authenticate
 
-	c.Directives.RequireOrganizerRole = directives.RequireOrganizerRole(eventOrganizersRepository)
+	c.Directives.RequireOrganizerRole = directives.RequireOrganizerRole(eventOrganizersRepository, eventAttendeeRepository)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
 

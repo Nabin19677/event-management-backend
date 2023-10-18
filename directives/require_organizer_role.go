@@ -11,7 +11,7 @@ import (
 	"github.io/anilk/crane/models"
 )
 
-func RequireOrganizerRole(eventOrganizersRepository *repositories.EventOrganizersRepository) func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []models.Role) (interface{}, error) {
+func RequireOrganizerRole(eventOrganizersRepository *repositories.EventOrganizersRepository, eventAttendeeRepository *repositories.EventAttendeeRepository) func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []models.Role) (interface{}, error) {
 	return func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []models.Role) (interface{}, error) {
 		eventId, ok := graphql.GetFieldContext(ctx).Args["eventId"].(int)
 
@@ -27,6 +27,14 @@ func RequireOrganizerRole(eventOrganizersRepository *repositories.EventOrganizer
 		for _, requiredRole := range roles {
 			if role == requiredRole.String() {
 				// User's role matches one of the required roles
+				if role == models.RoleAttendee.String() { // Check if "Attendee" role is present
+					// Check Attendees
+					eventAttendee, _ := eventAttendeeRepository.FindByEventAndUserId(eventId, user.UserID)
+
+					if eventAttendee.EventAttendeeID != 0 {
+						return next(ctx)
+					}
+				}
 				return next(ctx)
 			}
 		}
