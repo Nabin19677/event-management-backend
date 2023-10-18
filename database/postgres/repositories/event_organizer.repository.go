@@ -68,3 +68,16 @@ func (eor *EventOrganizersRepository) GetEventRole(eventId int, userId int) (str
 
 	return role.RoleName, err
 }
+
+func (eor *EventOrganizersRepository) FindByEventId(eventId int) ([]*models.EventOrganizer, error) {
+	var eventsOrganizers []*models.EventOrganizer
+
+	err := eor.goqu.
+		From(eor.GetTableName()).Where(goqu.Ex{"event_id": eventId}).ScanStructs(&eventsOrganizers)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return eventsOrganizers, nil
+}
