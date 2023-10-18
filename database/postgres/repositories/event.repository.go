@@ -67,7 +67,7 @@ func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent)
 			"location":    updatedEvent.Location,
 			"description": updatedEvent.Description,
 		},
-	)
+	).Where(goqu.Ex{"event_id": eventID})
 	updateSQL, _, _ := ds.ToSQL()
 
 	_, err := er.db.Query(updateSQL)
