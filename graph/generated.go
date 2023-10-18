@@ -4046,7 +4046,7 @@ func (ec *executionContext) _Query_getEventDetail(ctx context.Context, field gra
 			return ec.resolvers.Query().GetEventDetail(rctx, fc.Args["eventId"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Attendee"})
+			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Contributor", "Attendee"})
 			if err != nil {
 				return nil, err
 			}
