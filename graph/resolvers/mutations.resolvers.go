@@ -88,6 +88,13 @@ func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int
 
 // DeleteEventOrganizer is the resolver for the deleteEventOrganizer field.
 func (r *mutationResolver) DeleteEventOrganizer(ctx context.Context, eventID int, eventOrganizerID int) (bool, error) {
+	event, err := r.EventRepository.FindByID(eventID)
+	eventOrganizer, err := r.EventOrganizersRepository.FindByID(eventOrganizerID)
+
+	if event.AdminUserID == eventOrganizer.UserID {
+		return false, errors.New("cannot delete creator of the event.")
+	}
+
 	isDeleted, err := r.EventOrganizersRepository.Delete(eventOrganizerID)
 	if err != nil {
 		return false, err

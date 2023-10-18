@@ -22,6 +22,16 @@ func (eor *EventOrganizersRepository) GetTableName() string {
 	return "event_organizers"
 }
 
+func (eor *EventOrganizersRepository) FindByID(eventOrganizerId int) (*models.EventOrganizer, error) {
+	var eventOrganizer models.EventOrganizer
+	_, err := eor.goqu.
+		From(eor.GetTableName()).
+		Where(goqu.Ex{"event_organizer_id": eventOrganizerId}).
+		ScanStruct(&eventOrganizer)
+
+	return &eventOrganizer, err
+}
+
 func (eor *EventOrganizersRepository) Find() ([]*models.EventOrganizer, error) {
 	var eventsOrganizers []*models.EventOrganizer
 
