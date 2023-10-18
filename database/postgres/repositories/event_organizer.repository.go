@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/doug-martin/goqu/v9"
@@ -40,7 +41,8 @@ func (eor *EventOrganizersRepository) Insert(newEventOrganizer models.NewEventOr
 	).Executor().Exec()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return false, errors.New("could not add event organizer")
 	}
 
 	return true, nil
