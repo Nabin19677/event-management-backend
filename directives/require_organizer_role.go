@@ -25,17 +25,19 @@ func RequireOrganizerRole(eventOrganizersRepository *repositories.EventOrganizer
 		role, _ := eventOrganizersRepository.GetEventRole(eventId, user.UserID)
 
 		for _, requiredRole := range roles {
+			// User's role matches one of the required roles
 			if role == requiredRole.String() {
-				// User's role matches one of the required roles
-				if role == models.RoleAttendee.String() { // Check if "Attendee" role is present
-					// Check Attendees
-					eventAttendee, _ := eventAttendeeRepository.FindByEventAndUserId(eventId, user.UserID)
-
-					if eventAttendee.EventAttendeeID != 0 {
-						return next(ctx)
-					}
-				}
 				return next(ctx)
+			}
+			if requiredRole.String() == models.RoleAttendee.String() { // Check if "Attendee" role is present in required role
+
+				// Check Attendees
+				eventAttendee, _ := eventAttendeeRepository.FindByEventAndUserId(eventId, user.UserID)
+
+				if eventAttendee.EventAttendeeID != 0 {
+					return next(ctx)
+				}
+
 			}
 		}
 
