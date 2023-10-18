@@ -91,7 +91,7 @@ func (r *queryResolver) GetEventExpensesByCategory(ctx context.Context, eventID 
 
 // GetEventOrganizers is the resolver for the getEventOrganizers field.
 func (r *queryResolver) GetEventOrganizers(ctx context.Context, eventID int) ([]*models.EventOrganizer, error) {
-	eventsOrganizers, err := r.EventOrganizersRepository.Find()
+	eventsOrganizers, err := r.EventOrganizersRepository.FindByEventId(eventID)
 	if err != nil {
 		return nil, err
 	}
