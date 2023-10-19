@@ -23,11 +23,6 @@ type EventDetail struct {
 	Role     *string         `json:"role,omitempty"`
 }
 
-type LoginInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type Role string
 
 const (

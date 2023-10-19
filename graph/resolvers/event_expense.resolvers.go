@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
@@ -24,6 +25,10 @@ func (r *eventExpenseResolver) EventID(ctx context.Context, obj *models.EventExp
 
 // CreateEventExpense is the resolver for the createEventExpense field.
 func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	_, err := r.EventExpenseRepository.Insert(input)
 
 	if err != nil {

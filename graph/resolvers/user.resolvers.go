@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 
-	validation "github.io/anilk/crane/lib/validation"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
@@ -30,6 +30,9 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser)
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input models.LoginInput) (*models.AuthResponse, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return nil, err
+	}
 	user, err := r.UserRepository.FindByEmail(input.Email)
 	if err != nil {
 		return nil, errors.New("email or password is wrong")

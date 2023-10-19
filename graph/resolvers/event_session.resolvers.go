@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
@@ -24,6 +25,10 @@ func (r *eventSessionResolver) EventID(ctx context.Context, obj *models.EventSes
 
 // CreateEventSesssion is the resolver for the createEventSesssion field.
 func (r *mutationResolver) CreateEventSesssion(ctx context.Context, eventID int, input models.NewEventSession) (bool, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	_, err := r.EventSessionRepository.Insert(input)
 	if err != nil {
 		return false, err

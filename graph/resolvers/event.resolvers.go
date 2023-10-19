@@ -10,6 +10,7 @@ import (
 	"log"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/middleware"
 	"github.io/anilk/crane/models"
 )
@@ -27,8 +28,14 @@ func (r *eventResolver) AdminUserID(ctx context.Context, obj *models.Event) (*mo
 
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
+
 	user, _ := middleware.GetCurrentUserFromCTX(ctx)
 	input.AdminUserID = user.UserID
+
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	eventId, err := r.EventRepository.Insert(input)
 	if err != nil {
 		return false, err
@@ -46,6 +53,10 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEven
 
 // UpdateEvent is the resolver for the updateEvent field.
 func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	isUpdated, err := r.EventRepository.Update(eventID, input)
 	if err != nil {
 		return false, err

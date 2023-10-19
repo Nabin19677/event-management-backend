@@ -1,10 +1,10 @@
 package models
 
 type EventFields struct {
-	StartDate   *string `json:"startDate,omitempty" db:"start_date"`
-	EndDate     *string `json:"endDate,omitempty" db:"end_date"`
-	Location    *string `json:"location,omitempty" db:"location"`
-	Description *string `json:"description,omitempty" db:"description"`
+	StartDate   *string `json:"startDate,omitempty" db:"start_date" validate:"required"`
+	EndDate     *string `json:"endDate,omitempty" db:"end_date" validate:"required"`
+	Location    *string `json:"location,omitempty" db:"location" validate:"required"`
+	Description *string `json:"description,omitempty" db:"description" validate:"required"`
 }
 
 type Event struct {
@@ -15,9 +15,9 @@ type Event struct {
 }
 
 type NewEvent struct {
-	Name string `json:"name" db:"name"`
+	Name string `json:"name" db:"name" validate:"required"`
 	EventFields
-	AdminUserID int `json:"adminUserId" db:"admin_user_id"`
+	AdminUserID int `json:"adminUserId" db:"admin_user_id" validate:"required"`
 }
 
 type UpdateEvent struct {

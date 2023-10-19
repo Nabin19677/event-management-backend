@@ -30,6 +30,10 @@ type NewUser struct {
 	PhoneNumber string `json:"phoneNumber" db:"phone_number" validate:"required"`
 	Password    string `json:"password" db:"password" validate:"required"`
 }
+type LoginInput struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
 
 func (u *NewUser) HashPassword(password string) error {
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
