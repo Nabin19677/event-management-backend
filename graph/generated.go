@@ -143,6 +143,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Events                     func(childComplexity int) int
+		EventsExpenseCategories    func(childComplexity int) int
 		EventsOrganizers           func(childComplexity int) int
 		EventsRoles                func(childComplexity int) int
 		GetEventDetail             func(childComplexity int, eventID int) int
@@ -188,6 +189,7 @@ type QueryResolver interface {
 	Events(ctx context.Context) ([]*models.Event, error)
 	EventsOrganizers(ctx context.Context) ([]*models.EventOrganizer, error)
 	EventsRoles(ctx context.Context) ([]*models.EventRole, error)
+	EventsExpenseCategories(ctx context.Context) ([]*models.EventExpenseCategory, error)
 	OrganizedEvents(ctx context.Context) ([]*models.Event, error)
 	GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error)
 	GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error)
@@ -611,6 +613,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Events(childComplexity), true
+
+	case "Query.events_expense_categories":
+		if e.complexity.Query.EventsExpenseCategories == nil {
+			break
+		}
+
+		return e.complexity.Query.EventsExpenseCategories(childComplexity), true
 
 	case "Query.events_organizers":
 		if e.complexity.Query.EventsOrganizers == nil {
@@ -3946,6 +3955,53 @@ func (ec *executionContext) fieldContext_Query_events_roles(ctx context.Context,
 				return ec.fieldContext_EventRole_roleName(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EventRole", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_events_expense_categories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_events_expense_categories(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().EventsExpenseCategories(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.EventExpenseCategory)
+	fc.Result = res
+	return ec.marshalOEventExpenseCategory2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategoryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_events_expense_categories(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "categoryId":
+				return ec.fieldContext_EventExpenseCategory_categoryId(ctx, field)
+			case "categoryName":
+				return ec.fieldContext_EventExpenseCategory_categoryName(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventExpenseCategory", field.Name)
 		},
 	}
 	return fc, nil
@@ -7754,6 +7810,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "events_expense_categories":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_events_expense_categories(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "organized_events":
 			field := field
 
@@ -8333,6 +8408,16 @@ func (ec *executionContext) marshalNEventDetail2ᚖgithubᚗioᚋanilkᚋcrane�
 	return ec._EventDetail(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNEventExpenseCategory2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategory(ctx context.Context, sel ast.SelectionSet, v *models.EventExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EventExpenseCategory(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNEventOrganizer2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventOrganizer(ctx context.Context, sel ast.SelectionSet, v *models.EventOrganizer) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -8863,6 +8948,53 @@ func (ec *executionContext) marshalOEvent2ᚖgithubᚗioᚋanilkᚋcraneᚋmodel
 		return graphql.Null
 	}
 	return ec._Event(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOEventExpenseCategory2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.EventExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEventExpenseCategory2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventExpenseCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOEventOrganizer2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventOrganizerᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.EventOrganizer) graphql.Marshaler {

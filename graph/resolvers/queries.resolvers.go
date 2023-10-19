@@ -50,6 +50,15 @@ func (r *queryResolver) EventsRoles(ctx context.Context) ([]*models.EventRole, e
 	return eventsRoles, nil
 }
 
+// EventsExpenseCategories is the resolver for the events_expense_categories field.
+func (r *queryResolver) EventsExpenseCategories(ctx context.Context) ([]*models.EventExpenseCategory, error) {
+	categories, err := r.EventExpenseCategoryRepository.Find()
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
 // OrganizedEvents is the resolver for the organized_events field.
 func (r *queryResolver) OrganizedEvents(ctx context.Context) ([]*models.Event, error) {
 	user, _ := middleware.GetCurrentUserFromCTX(ctx)
