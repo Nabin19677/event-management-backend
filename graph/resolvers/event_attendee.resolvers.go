@@ -33,6 +33,15 @@ func (r *eventAttendeeResolver) UserID(ctx context.Context, obj *models.EventAtt
 	return user, nil
 }
 
+// CreateEventAttendee is the resolver for the createEventAttendee field.
+func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error) {
+	_, err := r.EventAttendeeRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // GetEventAttendees is the resolver for the getEventAttendees field.
 func (r *queryResolver) GetEventAttendees(ctx context.Context, eventID int) ([]*models.EventAttendee, error) {
 	eventAttendees, err := r.EventAttendeeRepository.FindAllByEventId(eventID)

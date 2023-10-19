@@ -174,15 +174,15 @@ type EventSessionResolver interface {
 	EventID(ctx context.Context, obj *models.EventSession) (*models.Event, error)
 }
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input models.NewUser) (bool, error)
-	Login(ctx context.Context, input models.LoginInput) (*models.AuthResponse, error)
 	CreateEvent(ctx context.Context, input models.NewEvent) (bool, error)
 	UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error)
+	CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error)
+	CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error)
 	CreateEventOrganizer(ctx context.Context, eventID int, input models.NewEventOrganizer) (bool, error)
 	DeleteEventOrganizer(ctx context.Context, eventID int, eventOrganizerID int) (bool, error)
 	CreateEventSesssion(ctx context.Context, eventID int, input models.NewEventSession) (bool, error)
-	CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error)
-	CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error)
+	CreateUser(ctx context.Context, input models.NewUser) (bool, error)
+	Login(ctx context.Context, input models.LoginInput) (*models.AuthResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.PublicUser, error)
@@ -814,7 +814,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schemas/event.graphql" "schemas/event_attendee.graphql" "schemas/event_expense.graphql" "schemas/event_organizer.graphql" "schemas/event_session.graphql" "schemas/mutations.graphql" "schemas/queries.graphql" "schemas/user.graphql"
+//go:embed "schemas/event.graphql" "schemas/event_attendee.graphql" "schemas/event_expense.graphql" "schemas/event_organizer.graphql" "schemas/event_session.graphql" "schemas/queries.graphql" "schemas/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -831,7 +831,6 @@ var sources = []*ast.Source{
 	{Name: "schemas/event_expense.graphql", Input: sourceData("schemas/event_expense.graphql"), BuiltIn: false},
 	{Name: "schemas/event_organizer.graphql", Input: sourceData("schemas/event_organizer.graphql"), BuiltIn: false},
 	{Name: "schemas/event_session.graphql", Input: sourceData("schemas/event_session.graphql"), BuiltIn: false},
-	{Name: "schemas/mutations.graphql", Input: sourceData("schemas/mutations.graphql"), BuiltIn: false},
 	{Name: "schemas/queries.graphql", Input: sourceData("schemas/queries.graphql"), BuiltIn: false},
 	{Name: "schemas/user.graphql", Input: sourceData("schemas/user.graphql"), BuiltIn: false},
 }
@@ -2905,120 +2904,6 @@ func (ec *executionContext) fieldContext_EventSession_endTime(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(models.NewUser))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_login(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(models.LoginInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*models.AuthResponse)
-	fc.Result = res
-	return ec.marshalNAuthResponse2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐAuthResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "authToken":
-				return ec.fieldContext_AuthResponse_authToken(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AuthResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createEvent(ctx, field)
 	if err != nil {
@@ -3173,6 +3058,176 @@ func (ec *executionContext) fieldContext_Mutation_updateEvent(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEventAttendee(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateEventAttendee(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventAttendee))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Contributor"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.RequireOrganizerRole == nil {
+				return nil, errors.New("directive requireOrganizerRole is not implemented")
+			}
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEventAttendee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEventAttendee_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEventExpense(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateEventExpense(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventExpense))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.RequireOrganizerRole == nil {
+				return nil, errors.New("directive requireOrganizerRole is not implemented")
+			}
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEventExpense(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEventExpense_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3434,8 +3489,8 @@ func (ec *executionContext) fieldContext_Mutation_createEventSesssion(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEventAttendee(ctx, field)
+func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3447,38 +3502,8 @@ func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, f
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateEventAttendee(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventAttendee))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Contributor"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.RequireOrganizerRole == nil {
-				return nil, errors.New("directive requireOrganizerRole is not implemented")
-			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
-		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Authenticate == nil {
-				return nil, errors.New("directive authenticate is not implemented")
-			}
-			return ec.directives.Authenticate(ctx, nil, directive1)
-		}
-
-		tmp, err := directive2(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(models.NewUser))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3495,7 +3520,7 @@ func (ec *executionContext) _Mutation_createEventAttendee(ctx context.Context, f
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createEventAttendee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3512,15 +3537,15 @@ func (ec *executionContext) fieldContext_Mutation_createEventAttendee(ctx contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEventAttendee_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEventExpense(ctx, field)
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_login(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3532,38 +3557,8 @@ func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, fi
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateEventExpense(rctx, fc.Args["eventId"].(int), fc.Args["input"].(models.NewEventExpense))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.RequireOrganizerRole == nil {
-				return nil, errors.New("directive requireOrganizerRole is not implemented")
-			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
-		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Authenticate == nil {
-				return nil, errors.New("directive authenticate is not implemented")
-			}
-			return ec.directives.Authenticate(ctx, nil, directive1)
-		}
-
-		tmp, err := directive2(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(bool); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(models.LoginInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3575,19 +3570,23 @@ func (ec *executionContext) _Mutation_createEventExpense(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*models.AuthResponse)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNAuthResponse2ᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐAuthResponse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createEventExpense(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "authToken":
+				return ec.fieldContext_AuthResponse_authToken(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuthResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3597,7 +3596,7 @@ func (ec *executionContext) fieldContext_Mutation_createEventExpense(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEventExpense_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7640,20 +7639,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createUser":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createUser(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "login":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_login(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createEvent":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createEvent(ctx, field)
@@ -7664,6 +7649,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateEvent":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateEvent(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createEventAttendee":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEventAttendee(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createEventExpense":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEventExpense(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -7689,16 +7688,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createEventAttendee":
+		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEventAttendee(ctx, field)
+				return ec._Mutation_createUser(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createEventExpense":
+		case "login":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEventExpense(ctx, field)
+				return ec._Mutation_login(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

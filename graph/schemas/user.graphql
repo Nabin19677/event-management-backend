@@ -20,12 +20,15 @@ input LoginInput {
 }
 
 type AuthToken {
-  accessToken : String!
-  expireAt : String!
+  accessToken: String!
+  expireAt: String!
 }
 
 type AuthResponse {
-  authToken : AuthToken!
+  authToken: AuthToken!
 }
 
-
+extend type Mutation {
+  createUser(input: NewUser!): Boolean!
+  login(input: LoginInput!): AuthResponse!
+}

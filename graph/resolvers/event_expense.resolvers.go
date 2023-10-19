@@ -22,6 +22,16 @@ func (r *eventExpenseResolver) EventID(ctx context.Context, obj *models.EventExp
 	return event, nil
 }
 
+// CreateEventExpense is the resolver for the createEventExpense field.
+func (r *mutationResolver) CreateEventExpense(ctx context.Context, eventID int, input models.NewEventExpense) (bool, error) {
+	_, err := r.EventExpenseRepository.Insert(input)
+
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
 func (r *queryResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
 	totalExpenses, _ := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)

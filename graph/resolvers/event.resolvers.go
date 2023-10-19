@@ -25,6 +25,34 @@ func (r *eventResolver) AdminUserID(ctx context.Context, obj *models.Event) (*mo
 	return user, nil
 }
 
+// CreateEvent is the resolver for the createEvent field.
+func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
+	user, _ := middleware.GetCurrentUserFromCTX(ctx)
+	input.AdminUserID = user.UserID
+	eventId, err := r.EventRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	_, err = r.EventOrganizersRepository.Insert(models.NewEventOrganizer{
+		EventID: eventId,
+		UserID:  user.UserID,
+		RoleID:  1,
+	})
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// UpdateEvent is the resolver for the updateEvent field.
+func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+	isUpdated, err := r.EventRepository.Update(eventID, input)
+	if err != nil {
+		return false, err
+	}
+	return isUpdated, nil
+}
+
 // OrganizedEvents is the resolver for the organized_events field.
 func (r *queryResolver) OrganizedEvents(ctx context.Context) ([]*models.Event, error) {
 	user, _ := middleware.GetCurrentUserFromCTX(ctx)
@@ -60,4 +88,8 @@ func (r *queryResolver) GetEventDetail(ctx context.Context, eventID int) (*model
 // Event returns graph.EventResolver implementation.
 func (r *Resolver) Event() graph.EventResolver { return &eventResolver{r} }
 
+// Mutation returns graph.MutationResolver implementation.
+func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
+
 type eventResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
