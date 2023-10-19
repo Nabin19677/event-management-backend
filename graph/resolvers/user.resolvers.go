@@ -8,13 +8,13 @@ import (
 	"context"
 	"errors"
 
-	validation "github.io/anilk/crane/lib"
+	validation "github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (bool, error) {
-	if err := validation.GetValidator().Struct(input); err != nil {
+	if err := validation.ValidateStruct(input); err != nil {
 		return false, err
 	}
 	existingUser, err := r.UserRepository.FindByEmail(input.Email)
