@@ -28,13 +28,6 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-type UpdateEvent struct {
-	StartDate   string `json:"startDate"`
-	EndDate     string `json:"endDate"`
-	Location    string `json:"location"`
-	Description string `json:"description"`
-}
-
 type Role string
 
 const (
