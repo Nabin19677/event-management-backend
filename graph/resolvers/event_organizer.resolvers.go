@@ -44,6 +44,15 @@ func (r *eventOrganizerResolver) RoleID(ctx context.Context, obj *models.EventOr
 	return role, nil
 }
 
+// GetEventOrganizers is the resolver for the getEventOrganizers field.
+func (r *queryResolver) GetEventOrganizers(ctx context.Context, eventID int) ([]*models.EventOrganizer, error) {
+	eventsOrganizers, err := r.EventOrganizersRepository.FindByEventId(eventID)
+	if err != nil {
+		return nil, err
+	}
+	return eventsOrganizers, nil
+}
+
 // EventOrganizer returns graph.EventOrganizerResolver implementation.
 func (r *Resolver) EventOrganizer() graph.EventOrganizerResolver { return &eventOrganizerResolver{r} }
 

@@ -30,3 +30,9 @@ type EventDetail {
     role: String
 }
 
+extend type Query {
+    organized_events: [Event!]  @authenticate
+
+    getEventDetail(eventId: Int!): EventDetail! @requireOrganizerRole(role: [Admin, Contributor, Attendee]) @authenticate
+}
+

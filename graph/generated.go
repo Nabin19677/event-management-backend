@@ -144,7 +144,6 @@ type ComplexityRoot struct {
 	Query struct {
 		Events                     func(childComplexity int) int
 		EventsExpenseCategories    func(childComplexity int) int
-		EventsOrganizers           func(childComplexity int) int
 		EventsRoles                func(childComplexity int) int
 		GetEventAttendees          func(childComplexity int, eventID int) int
 		GetEventDetail             func(childComplexity int, eventID int) int
@@ -188,15 +187,14 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.PublicUser, error)
 	Events(ctx context.Context) ([]*models.Event, error)
-	EventsOrganizers(ctx context.Context) ([]*models.EventOrganizer, error)
 	EventsRoles(ctx context.Context) ([]*models.EventRole, error)
 	EventsExpenseCategories(ctx context.Context) ([]*models.EventExpenseCategory, error)
 	OrganizedEvents(ctx context.Context) ([]*models.Event, error)
 	GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error)
+	GetEventAttendees(ctx context.Context, eventID int) ([]*models.EventAttendee, error)
 	GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error)
 	GetEventOrganizers(ctx context.Context, eventID int) ([]*models.EventOrganizer, error)
 	GetEventSessions(ctx context.Context, eventID int) ([]*models.EventSession, error)
-	GetEventAttendees(ctx context.Context, eventID int) ([]*models.EventAttendee, error)
 }
 
 type executableSchema struct {
@@ -622,13 +620,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.EventsExpenseCategories(childComplexity), true
-
-	case "Query.events_organizers":
-		if e.complexity.Query.EventsOrganizers == nil {
-			break
-		}
-
-		return e.complexity.Query.EventsOrganizers(childComplexity), true
 
 	case "Query.events_roles":
 		if e.complexity.Query.EventsRoles == nil {
@@ -3891,57 +3882,6 @@ func (ec *executionContext) fieldContext_Query_events(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_events_organizers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_events_organizers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().EventsOrganizers(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*models.EventOrganizer)
-	fc.Result = res
-	return ec.marshalOEventOrganizer2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventOrganizerᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_events_organizers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "eventOrganizerId":
-				return ec.fieldContext_EventOrganizer_eventOrganizerId(ctx, field)
-			case "eventId":
-				return ec.fieldContext_EventOrganizer_eventId(ctx, field)
-			case "userId":
-				return ec.fieldContext_EventOrganizer_userId(ctx, field)
-			case "roleId":
-				return ec.fieldContext_EventOrganizer_roleId(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type EventOrganizer", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_events_roles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_events_roles(ctx, field)
 	if err != nil {
@@ -4200,6 +4140,96 @@ func (ec *executionContext) fieldContext_Query_getEventDetail(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getEventDetail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getEventAttendees(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getEventAttendees(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GetEventAttendees(rctx, fc.Args["eventId"].(int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Contributor"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.RequireOrganizerRole == nil {
+				return nil, errors.New("directive requireOrganizerRole is not implemented")
+			}
+			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticate == nil {
+				return nil, errors.New("directive authenticate is not implemented")
+			}
+			return ec.directives.Authenticate(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*models.EventAttendee); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.io/anilk/crane/models.EventAttendee`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.EventAttendee)
+	fc.Result = res
+	return ec.marshalOEventAttendee2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventAttendeeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getEventAttendees(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "eventAttendeeId":
+				return ec.fieldContext_EventAttendee_eventAttendeeId(ctx, field)
+			case "eventId":
+				return ec.fieldContext_EventAttendee_eventId(ctx, field)
+			case "userId":
+				return ec.fieldContext_EventAttendee_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventAttendee", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getEventAttendees_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4477,96 +4507,6 @@ func (ec *executionContext) fieldContext_Query_getEventSessions(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getEventSessions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_getEventAttendees(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getEventAttendees(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetEventAttendees(rctx, fc.Args["eventId"].(int))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			role, err := ec.unmarshalNRole2ᚕgithubᚗioᚋanilkᚋcraneᚋmodelsᚐRoleᚄ(ctx, []interface{}{"Admin", "Contributor"})
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.RequireOrganizerRole == nil {
-				return nil, errors.New("directive requireOrganizerRole is not implemented")
-			}
-			return ec.directives.RequireOrganizerRole(ctx, nil, directive0, role)
-		}
-		directive2 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Authenticate == nil {
-				return nil, errors.New("directive authenticate is not implemented")
-			}
-			return ec.directives.Authenticate(ctx, nil, directive1)
-		}
-
-		tmp, err := directive2(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*models.EventAttendee); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.io/anilk/crane/models.EventAttendee`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*models.EventAttendee)
-	fc.Result = res
-	return ec.marshalOEventAttendee2ᚕᚖgithubᚗioᚋanilkᚋcraneᚋmodelsᚐEventAttendeeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getEventAttendees(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "eventAttendeeId":
-				return ec.fieldContext_EventAttendee_eventAttendeeId(ctx, field)
-			case "eventId":
-				return ec.fieldContext_EventAttendee_eventId(ctx, field)
-			case "userId":
-				return ec.fieldContext_EventAttendee_userId(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type EventAttendee", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getEventAttendees_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7891,25 +7831,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "events_organizers":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_events_organizers(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "events_roles":
 			field := field
 
@@ -7989,6 +7910,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getEventAttendees":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getEventAttendees(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getEventExpensesByCategory":
 			field := field
 
@@ -8040,25 +7980,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getEventSessions(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getEventAttendees":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getEventAttendees(ctx, field)
 				return res
 			}
 

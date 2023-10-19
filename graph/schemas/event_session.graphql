@@ -13,3 +13,7 @@ input NewEventSession {
     startTime: String!
     endTime: String!
 }
+
+extend type Query {
+     getEventSessions(eventId: Int!) : [EventSession!]  @requireOrganizerRole(role: [Admin, Contributor, Attendee]) @authenticate
+}

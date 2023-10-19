@@ -26,3 +26,6 @@ input NewEventExpense{
     categoryId: Int!
 }
 
+extend type Query {
+   getEventExpensesByCategory(eventId: Int!) : [CategoryTotal!]!  @requireOrganizerRole(role: [Admin, Contributor]) @authenticate
+}

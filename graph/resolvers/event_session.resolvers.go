@@ -22,6 +22,15 @@ func (r *eventSessionResolver) EventID(ctx context.Context, obj *models.EventSes
 	return event, nil
 }
 
+// GetEventSessions is the resolver for the getEventSessions field.
+func (r *queryResolver) GetEventSessions(ctx context.Context, eventID int) ([]*models.EventSession, error) {
+	eventsOrganizers, err := r.EventSessionRepository.FindAllByEventId(eventID)
+	if err != nil {
+		return nil, err
+	}
+	return eventsOrganizers, nil
+}
+
 // EventSession returns graph.EventSessionResolver implementation.
 func (r *Resolver) EventSession() graph.EventSessionResolver { return &eventSessionResolver{r} }
 

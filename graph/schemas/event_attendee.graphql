@@ -9,3 +9,7 @@ input NewEventAttendee{
     eventId: Int!
     userId: Int!
 }
+
+extend type Query {
+     getEventAttendees(eventId: Int!) : [EventAttendee!]  @requireOrganizerRole(role: [Admin, Contributor]) @authenticate
+}

@@ -22,6 +22,13 @@ func (r *eventExpenseResolver) EventID(ctx context.Context, obj *models.EventExp
 	return event, nil
 }
 
+// GetEventExpensesByCategory is the resolver for the getEventExpensesByCategory field.
+func (r *queryResolver) GetEventExpensesByCategory(ctx context.Context, eventID int) ([]*models.CategoryTotal, error) {
+	totalExpenses, _ := r.EventExpenseRepository.GetTotalExpensesByCategory(eventID)
+
+	return totalExpenses, nil
+}
+
 // EventExpense returns graph.EventExpenseResolver implementation.
 func (r *Resolver) EventExpense() graph.EventExpenseResolver { return &eventExpenseResolver{r} }
 
