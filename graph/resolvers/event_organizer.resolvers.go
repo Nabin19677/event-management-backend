@@ -9,6 +9,7 @@ import (
 	"errors"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
@@ -47,6 +48,10 @@ func (r *eventOrganizerResolver) RoleID(ctx context.Context, obj *models.EventOr
 
 // CreateEventOrganizer is the resolver for the createEventOrganizer field.
 func (r *mutationResolver) CreateEventOrganizer(ctx context.Context, eventID int, input models.NewEventOrganizer) (bool, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	eventOrganizerCreated, err := r.EventOrganizersRepository.Insert(input)
 	if err != nil {
 		return false, err

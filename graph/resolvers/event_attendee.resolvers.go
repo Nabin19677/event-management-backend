@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/lib/validation"
 	"github.io/anilk/crane/models"
 )
 
@@ -35,6 +36,10 @@ func (r *eventAttendeeResolver) UserID(ctx context.Context, obj *models.EventAtt
 
 // CreateEventAttendee is the resolver for the createEventAttendee field.
 func (r *mutationResolver) CreateEventAttendee(ctx context.Context, eventID int, input models.NewEventAttendee) (bool, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return false, err
+	}
+
 	_, err := r.EventAttendeeRepository.Insert(input)
 	if err != nil {
 		return false, err

@@ -20,7 +20,6 @@ func init() {
 
 	validate.RegisterTranslation("required", en,
 		func(ut ut.Translator) error {
-			fmt.Println(ut)
 			return ut.Add("required", "{0} is required", false)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {

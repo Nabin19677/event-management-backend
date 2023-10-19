@@ -1,11 +1,11 @@
 package models
 
 type EventExpenseFields struct {
-	EventID     int     `json:"eventId" db:"event_id"`
-	ItemName    string  `json:"itemName" db:"item_name"`
-	Cost        float64 `json:"cost" db:"cost"`
-	Description string  `json:"description" db:"description"`
-	CategoryID  int     `json:"categoryId" db:"category_id"`
+	EventID     int     `json:"eventId" db:"event_id" validate:"required"`
+	ItemName    string  `json:"itemName" db:"item_name" validate:"required"`
+	Cost        float64 `json:"cost" db:"cost" validate:"required"`
+	Description string  `json:"description" db:"description" validate:"required"`
+	CategoryID  int     `json:"categoryId" db:"category_id" validate:"required"`
 }
 
 type EventExpense struct {
