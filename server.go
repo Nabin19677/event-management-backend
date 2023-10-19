@@ -26,6 +26,8 @@ func main() {
 
 	db, goqu := postgres.CreateDBConnection()
 
+	defer db.Close()
+
 	userRepository := repositories.InitUserRepository(db, goqu)
 	eventRepository := repositories.InitEventRepository(db, goqu)
 	eventOrganizersRepository := repositories.InitEventOrganizersRepository(db, goqu)
