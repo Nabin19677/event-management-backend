@@ -33,14 +33,6 @@ type NewEventAttendee struct {
 	UserID  int `json:"userId"`
 }
 
-type NewEventExpense struct {
-	EventID     int     `json:"eventId"`
-	ItemName    string  `json:"itemName"`
-	Cost        float64 `json:"cost"`
-	Description *string `json:"description,omitempty"`
-	CategoryID  int     `json:"categoryId"`
-}
-
 type NewEventSession struct {
 	EventID   int    `json:"eventId"`
 	Name      string `json:"name"`

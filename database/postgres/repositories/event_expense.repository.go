@@ -21,10 +21,10 @@ func (er *EventExpenseRepository) GetTableName() string {
 }
 
 func (er *EventExpenseRepository) Insert(newEvent models.NewEventExpense) (int, error) {
-	query := `INSERT INTO ` + er.GetTableName() + ` (event_id, item_name, cost, description, category_id) VALUES ($1, $2, $3, $4, $5) RETURNING expense_id`
+	query, _, _ := goqu.Insert(er.GetTableName()).Rows(newEvent).Returning("expense_id").ToSQL()
 
 	var lastInsertID int
-	err := er.db.QueryRow(query, newEvent.EventID, newEvent.ItemName, newEvent.Cost, newEvent.Description, newEvent.CategoryID).Scan(&lastInsertID)
+	err := er.db.QueryRow(query).Scan(&lastInsertID)
 	if err != nil {
 		return -1, err
 	}
