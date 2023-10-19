@@ -47,16 +47,15 @@ func (er *EventRepository) Find() ([]*models.Event, error) {
 }
 
 func (er *EventRepository) Insert(newEvent models.NewEvent) (int, error) {
-	query := `INSERT INTO ` + er.GetTableName() + ` (name, start_date, end_date, location, description, admin_user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING event_id`
+	query, _, _ := goqu.Insert(er.GetTableName()).Rows(newEvent).Returning("event_id").ToSQL()
 
 	var lastInsertID int
-	err := er.db.QueryRow(query, newEvent.Name, newEvent.StartDate, newEvent.EndDate, newEvent.Location, newEvent.Description, newEvent.AdminUserID).Scan(&lastInsertID)
+	err := er.db.QueryRow(query).Scan(&lastInsertID)
 	if err != nil {
 		return -1, err
 	}
 
 	return lastInsertID, nil
-
 }
 
 func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent) (bool, error) {
