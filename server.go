@@ -3,27 +3,82 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"github.io/anilk/crane/conf"
+	"github.io/anilk/crane/database/postgres"
+	"github.io/anilk/crane/database/postgres/repositories"
+	"github.io/anilk/crane/directives"
 	"github.io/anilk/crane/graph"
 	"github.io/anilk/crane/graph/resolvers"
+	appMiddleware "github.io/anilk/crane/middleware"
 )
 
 const defaultPort = "8080"
 
 func main() {
-	port := os.Getenv("PORT")
+	conf.InitEnvConfigs()
+
+	db, goqu := postgres.CreateDBConnection()
+
+	defer db.Close()
+
+	userRepository := repositories.InitUserRepository(db, goqu)
+	eventRepository := repositories.InitEventRepository(db, goqu)
+	eventOrganizersRepository := repositories.InitEventOrganizersRepository(db, goqu)
+	eventRoleRepository := repositories.InitEventRoleRepository(db, goqu)
+	eventAttendeeRepository := repositories.InitEventAttendeeRepository(db, goqu)
+	eventSessionRepository := repositories.InitEventSessionRepository(db, goqu)
+	eventExpenseRepository := repositories.InitEventExpenseRepository(db, goqu)
+	eventExpenseCategoryRepository := repositories.InitEventExpenseCategoryRepository(db, goqu)
+
+	resolversMap := &resolvers.Resolver{
+		UserRepository:                 userRepository,
+		EventRepository:                eventRepository,
+		EventOrganizersRepository:      eventOrganizersRepository,
+		EventRoleRepository:            eventRoleRepository,
+		EventAttendeeRepository:        eventAttendeeRepository,
+		EventSessionRepository:         eventSessionRepository,
+		EventExpenseRepository:         eventExpenseRepository,
+		EventExpenseCategoryRepository: eventExpenseCategoryRepository,
+	}
+
+	port := conf.EnvConfigs.ServerPort
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{}}))
+	router := chi.NewRouter()
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Use "*" to allow all origins
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+		Debug:            true,
+	}).Handler
+
+	router.Use(corsHandler)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(appMiddleware.AuthMiddleware(userRepository))
+
+	c := graph.Config{Resolvers: resolversMap}
+
+	c.Directives.Authenticate = directives.Authenticate
+
+	c.Directives.RequireOrganizerRole = directives.RequireOrganizerRole(eventOrganizersRepository, eventAttendeeRepository)
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }

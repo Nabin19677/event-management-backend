@@ -14,7 +14,7 @@ exec:
 
 # Where should any generated models go?
 model:
-  filename: models/__gen__.go
+  filename: models/generated.go
   package: models
 
 # Where should the resolver implementations go?
@@ -87,3 +87,8 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
   User:
     model : github.io/anilk/crane/models.User
+  Event:
+    model : github.io/anilk/crane/models.Event
+    fields:
+      adminUserId : 
+        resolver : true

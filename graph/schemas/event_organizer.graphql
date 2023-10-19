@@ -1,0 +1,40 @@
+directive @requireOrganizerRole(role: [Role!]!) on FIELD_DEFINITION
+
+enum Role {
+  Admin
+  Contributor
+  Attendee
+}
+
+type EventOrganizer {
+  eventOrganizerId: Int!
+  eventId: Event!
+  userId: PublicUser!
+  roleId: EventRole!
+}
+
+type EventRole {
+  roleId: Int!
+  roleName: String!
+}
+
+input NewEventOrganizer {
+  eventId: Int!
+  userId: Int!
+  roleId: Int!
+}
+
+extend type Query {
+  getEventOrganizers(eventId: Int!): [EventOrganizer!]
+    @requireOrganizerRole(role: [Admin, Contributor])
+    @authenticate
+}
+
+extend type Mutation {
+  createEventOrganizer(eventId: Int!, input: NewEventOrganizer!): Boolean!
+    @requireOrganizerRole(role: [Admin])
+    @authenticate
+  deleteEventOrganizer(eventId: Int!, eventOrganizerId: Int!): Boolean!
+    @requireOrganizerRole(role: [Admin])
+    @authenticate
+}

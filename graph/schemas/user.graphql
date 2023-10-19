@@ -1,21 +1,34 @@
+directive @authenticate on FIELD_DEFINITION
 
-type User {
-  id: String!
+type PublicUser {
+  userId: Int!
   name: String!
   email: String
   phoneNumber: String
-}
-
-type Query {
-  users: [User!]!
 }
 
 input NewUser {
   name: String!
   email: String
   phoneNumber: String
+  password: String!
 }
 
-type Mutation {
-  createUser(input: NewUser!): User!
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type AuthToken {
+  accessToken: String!
+  expireAt: String!
+}
+
+type AuthResponse {
+  authToken: AuthToken!
+}
+
+extend type Mutation {
+  createUser(input: NewUser!): Boolean!
+  login(input: LoginInput!): AuthResponse!
 }

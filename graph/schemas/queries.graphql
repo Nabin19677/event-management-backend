@@ -1,0 +1,6 @@
+type Query {
+  users: [PublicUser!]
+  events: [Event!]
+  events_roles: [EventRole!]
+  events_expense_categories: [EventExpenseCategory!]
+}

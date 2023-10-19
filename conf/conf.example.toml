@@ -1,5 +1,4 @@
-[database]
-username = "John"
-password = "Doe"
-host = "localhost"
-port = 5000
+DATABASE_SOURCE = "postgres://postgres:2020@localhost:5432/krane?sslmode=disable"
+SERVER_PORT = "4000"
+JWT_SECRET = "thisisasecret"
+JWT_ISSUER = "leapfrog"

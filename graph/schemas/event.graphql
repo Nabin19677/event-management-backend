@@ -1,0 +1,45 @@
+type Event {
+  eventId: Int!
+  name: String!
+  startDate: String
+  endDate: String
+  location: String
+  description: String
+  adminUserId: PublicUser!
+}
+
+input NewEvent {
+  name: String!
+  startDate: String
+  endDate: String
+  location: String
+  description: String
+}
+
+input UpdateEvent {
+  startDate: String!
+  endDate: String!
+  location: String!
+  description: String!
+}
+
+type EventDetail {
+  event: Event
+  sessions: [EventSession]
+  role: String
+}
+
+extend type Query {
+  organized_events: [Event!] @authenticate
+
+  getEventDetail(eventId: Int!): EventDetail!
+    @requireOrganizerRole(role: [Admin, Contributor, Attendee])
+    @authenticate
+}
+
+extend type Mutation {
+  createEvent(input: NewEvent!): Boolean! @authenticate
+  updateEvent(eventId: Int!, input: UpdateEvent): Boolean!
+    @requireOrganizerRole(role: [Admin])
+    @authenticate
+}
