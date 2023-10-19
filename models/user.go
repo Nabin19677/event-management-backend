@@ -25,10 +25,10 @@ type PublicUser struct {
 }
 
 type NewUser struct {
-	Name        string `json:"name" db:"name"`
-	Email       string `json:"email" db:"email"`
-	PhoneNumber string `json:"phoneNumber" db:"phone_number"`
-	Password    string `json:"password" db:"password"`
+	Name        string `json:"name" db:"name" validate:"required"`
+	Email       string `json:"email" db:"email" validate:"required,email"`
+	PhoneNumber string `json:"phoneNumber" db:"phone_number" validate:"required"`
+	Password    string `json:"password" db:"password" validate:"required"`
 }
 
 func (u *NewUser) HashPassword(password string) error {
