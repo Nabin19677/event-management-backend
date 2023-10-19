@@ -116,6 +116,15 @@ func (r *queryResolver) GetEventSessions(ctx context.Context, eventID int) ([]*m
 	return eventsOrganizers, nil
 }
 
+// GetEventAttendees is the resolver for the getEventAttendees field.
+func (r *queryResolver) GetEventAttendees(ctx context.Context, eventID int) ([]*models.EventAttendee, error) {
+	eventAttendees, err := r.EventAttendeeRepository.FindAllByEventId(eventID)
+	if err != nil {
+		return nil, err
+	}
+	return eventAttendees, nil
+}
+
 // Query returns graph.QueryResolver implementation.
 func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 

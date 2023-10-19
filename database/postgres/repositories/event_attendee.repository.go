@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.io/anilk/crane/models"
@@ -45,4 +46,18 @@ func (ea *EventAttendeeRepository) FindByEventAndUserId(eventId int, userId int)
 	}
 
 	return &eventAttendee, err
+}
+
+func (es *EventAttendeeRepository) FindAllByEventId(eventId int) ([]*models.EventAttendee, error) {
+	var eventAttendees []*models.EventAttendee
+
+	err := es.goqu.
+		From(es.GetTableName()).Where(goqu.Ex{"event_id": eventId}).ScanStructs(&eventAttendees)
+
+	if err != nil {
+		log.Println("find failed :", err)
+		return eventAttendees, err
+	}
+
+	return eventAttendees, nil
 }
