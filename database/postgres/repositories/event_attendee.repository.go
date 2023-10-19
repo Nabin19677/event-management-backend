@@ -22,16 +22,15 @@ func (ea *EventAttendeeRepository) GetTableName() string {
 }
 
 func (ea *EventAttendeeRepository) Insert(newEvent models.NewEventAttendee) (int, error) {
-	query := `INSERT INTO ` + ea.GetTableName() + ` (event_id, user_id) VALUES ($1, $2) RETURNING event_id`
+	query, _, _ := goqu.Insert(ea.GetTableName()).Rows(newEvent).Returning("event_id").ToSQL()
 
 	var lastInsertID int
-	err := ea.db.QueryRow(query, newEvent.EventID, newEvent.UserID).Scan(&lastInsertID)
+	err := ea.db.QueryRow(query).Scan(&lastInsertID)
 	if err != nil {
 		return -1, err
 	}
 
 	return lastInsertID, nil
-
 }
 
 func (ea *EventAttendeeRepository) FindByEventAndUserId(eventId int, userId int) (*models.EventAttendee, error) {

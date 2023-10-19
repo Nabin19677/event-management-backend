@@ -28,18 +28,6 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-type NewEventAttendee struct {
-	EventID int `json:"eventId"`
-	UserID  int `json:"userId"`
-}
-
-type NewEventSession struct {
-	EventID   int    `json:"eventId"`
-	Name      string `json:"name"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
-}
-
 type UpdateEvent struct {
 	StartDate   string `json:"startDate"`
 	EndDate     string `json:"endDate"`

@@ -36,10 +36,10 @@ func (es *EventSessionRepository) FindAllByEventId(eventId int) ([]*models.Event
 }
 
 func (es *EventSessionRepository) Insert(newEvent models.NewEventSession) (int, error) {
-	query := `INSERT INTO ` + es.GetTableName() + ` (event_id, name, start_time, end_time) VALUES ($1, $2, $3, $4) RETURNING session_id`
+	query, _, _ := goqu.Insert(es.GetTableName()).Rows(newEvent).Returning("session_id").ToSQL()
 
 	var lastInsertID int
-	err := es.db.QueryRow(query, newEvent.EventID, newEvent.Name, newEvent.StartTime, newEvent.EndTime).Scan(&lastInsertID)
+	err := es.db.QueryRow(query).Scan(&lastInsertID)
 	if err != nil {
 		return -1, err
 	}
