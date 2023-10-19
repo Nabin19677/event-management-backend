@@ -67,7 +67,7 @@ func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent)
 			"location":    updatedEvent.Location,
 			"description": updatedEvent.Description,
 		},
-	)
+	).Where(goqu.Ex{"event_id": eventID})
 	updateSQL, _, _ := ds.ToSQL()
 
 	_, err := er.db.Query(updateSQL)
@@ -77,4 +77,17 @@ func (er *EventRepository) Update(eventID int, updatedEvent *models.UpdateEvent)
 	}
 
 	return true, err
+}
+
+func (er *EventRepository) FindByOrganizerId(userId int) ([]*models.Event, error) {
+	var events []*models.Event
+
+	err := er.goqu.
+		From(er.GetTableName()).ScanStructs(&events)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return events, nil
 }

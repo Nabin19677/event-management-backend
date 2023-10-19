@@ -6,8 +6,11 @@ package resolvers
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.io/anilk/crane/graph"
+	"github.io/anilk/crane/middleware"
 	"github.io/anilk/crane/models"
 )
 
@@ -22,7 +25,71 @@ func (r *eventResolver) AdminUserID(ctx context.Context, obj *models.Event) (*mo
 	return user, nil
 }
 
+// CreateEvent is the resolver for the createEvent field.
+func (r *mutationResolver) CreateEvent(ctx context.Context, input models.NewEvent) (bool, error) {
+	user, _ := middleware.GetCurrentUserFromCTX(ctx)
+	input.AdminUserID = user.UserID
+	eventId, err := r.EventRepository.Insert(input)
+	if err != nil {
+		return false, err
+	}
+	_, err = r.EventOrganizersRepository.Insert(models.NewEventOrganizer{
+		EventID: eventId,
+		UserID:  user.UserID,
+		RoleID:  1,
+	})
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// UpdateEvent is the resolver for the updateEvent field.
+func (r *mutationResolver) UpdateEvent(ctx context.Context, eventID int, input *models.UpdateEvent) (bool, error) {
+	isUpdated, err := r.EventRepository.Update(eventID, input)
+	if err != nil {
+		return false, err
+	}
+	return isUpdated, nil
+}
+
+// OrganizedEvents is the resolver for the organized_events field.
+func (r *queryResolver) OrganizedEvents(ctx context.Context) ([]*models.Event, error) {
+	user, _ := middleware.GetCurrentUserFromCTX(ctx)
+	events, err := r.EventRepository.FindByOrganizerId(user.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
+// GetEventDetail is the resolver for the getEventDetail field.
+func (r *queryResolver) GetEventDetail(ctx context.Context, eventID int) (*models.EventDetail, error) {
+	user, _ := middleware.GetCurrentUserFromCTX(ctx)
+
+	event, err := r.EventRepository.FindByID(eventID)
+
+	role, err := r.EventOrganizersRepository.GetEventRole(eventID, user.UserID)
+
+	sessions, err := r.EventSessionRepository.FindAllByEventId(eventID)
+
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("unable to find event details")
+	}
+
+	return &models.EventDetail{
+		Event:    event,
+		Sessions: sessions,
+		Role:     &role,
+	}, nil
+}
+
 // Event returns graph.EventResolver implementation.
 func (r *Resolver) Event() graph.EventResolver { return &eventResolver{r} }
 
+// Mutation returns graph.MutationResolver implementation.
+func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
+
 type eventResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }

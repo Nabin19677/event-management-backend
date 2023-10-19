@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.io/anilk/crane/models"
@@ -31,4 +32,32 @@ func (ea *EventAttendeeRepository) Insert(newEvent models.NewEventAttendee) (int
 
 	return lastInsertID, nil
 
+}
+
+func (ea *EventAttendeeRepository) FindByEventAndUserId(eventId int, userId int) (*models.EventAttendee, error) {
+	var eventAttendee models.EventAttendee
+	_, err := ea.goqu.
+		From(ea.GetTableName()).
+		Where(goqu.Ex{"event_id": eventId, "user_id": userId}).
+		ScanStruct(&eventAttendee)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &eventAttendee, err
+}
+
+func (es *EventAttendeeRepository) FindAllByEventId(eventId int) ([]*models.EventAttendee, error) {
+	var eventAttendees []*models.EventAttendee
+
+	err := es.goqu.
+		From(es.GetTableName()).Where(goqu.Ex{"event_id": eventId}).ScanStructs(&eventAttendees)
+
+	if err != nil {
+		log.Println("find failed :", err)
+		return eventAttendees, err
+	}
+
+	return eventAttendees, nil
 }

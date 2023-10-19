@@ -1,17 +1,22 @@
-
 type EventAttendee {
-    eventAttendeeId: Int!
-    eventId: Event
-    userId: PublicUser
+  eventAttendeeId: Int!
+  eventId: Event
+  userId: PublicUser
 }
 
-input NewEventAttendee{
-    eventId: Int!
-    userId: Int!
+input NewEventAttendee {
+  eventId: Int!
+  userId: Int!
 }
 
-type EventDetail {
-    event: Event
-    sessions: [EventSession]
+extend type Query {
+  getEventAttendees(eventId: Int!): [EventAttendee!]
+    @requireOrganizerRole(role: [Admin, Contributor])
+    @authenticate
+}
 
+extend type Mutation {
+  createEventAttendee(eventId: Int!, input: NewEventAttendee!): Boolean!
+    @requireOrganizerRole(role: [Contributor])
+    @authenticate
 }

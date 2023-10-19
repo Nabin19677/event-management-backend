@@ -1,15 +1,26 @@
-
 type EventSession {
-    sessionId: Int!
-    eventId: Event!
-    name: String!
-    startTime: String!
-    endTime: String!
+  sessionId: Int!
+  eventId: Event!
+  name: String!
+  startTime: String!
+  endTime: String!
 }
 
 input NewEventSession {
-    eventId: Int!
-    name: String!
-    startTime: String!
-    endTime: String!
+  eventId: Int!
+  name: String!
+  startTime: String!
+  endTime: String!
+}
+
+extend type Query {
+  getEventSessions(eventId: Int!): [EventSession!]
+    @requireOrganizerRole(role: [Admin, Contributor, Attendee])
+    @authenticate
+}
+
+extend type Mutation {
+  createEventSesssion(eventId: Int!, input: NewEventSession!): Boolean!
+    @requireOrganizerRole(role: [Admin, Contributor])
+    @authenticate
 }

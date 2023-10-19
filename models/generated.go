@@ -20,6 +20,7 @@ type AuthToken struct {
 type EventDetail struct {
 	Event    *Event          `json:"event,omitempty"`
 	Sessions []*EventSession `json:"sessions,omitempty"`
+	Role     *string         `json:"role,omitempty"`
 }
 
 type LoginInput struct {
@@ -30,14 +31,6 @@ type LoginInput struct {
 type NewEventAttendee struct {
 	EventID int `json:"eventId"`
 	UserID  int `json:"userId"`
-}
-
-type NewEventExpense struct {
-	EventID     int     `json:"eventId"`
-	ItemName    string  `json:"itemName"`
-	Cost        float64 `json:"cost"`
-	Description *string `json:"description,omitempty"`
-	CategoryID  int     `json:"categoryId"`
 }
 
 type NewEventSession struct {

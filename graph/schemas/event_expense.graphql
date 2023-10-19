@@ -1,11 +1,10 @@
-
 type EventExpense {
-    expenseId: Int!
-    eventId: Event!
-    itemName: String!
-    cost: Float!
-    description: String
-    categoryId: Int!
+  expenseId: Int!
+  eventId: Event!
+  itemName: String!
+  cost: Float!
+  description: String
+  categoryId: Int!
 }
 
 type EventExpenseCategory {
@@ -18,11 +17,22 @@ type CategoryTotal {
   totalCost: Float!
 }
 
-input NewEventExpense{
-    eventId: Int!
-    itemName: String!
-    cost: Float!
-    description: String
-    categoryId: Int!
+input NewEventExpense {
+  eventId: Int!
+  itemName: String!
+  cost: Float!
+  description: String
+  categoryId: Int!
 }
 
+extend type Query {
+  getEventExpensesByCategory(eventId: Int!): [CategoryTotal!]!
+    @requireOrganizerRole(role: [Admin, Contributor])
+    @authenticate
+}
+
+extend type Mutation {
+  createEventExpense(eventId: Int!, input: NewEventExpense!): Boolean!
+    @requireOrganizerRole(role: [Admin])
+    @authenticate
+}

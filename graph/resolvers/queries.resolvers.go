@@ -29,15 +29,6 @@ func (r *queryResolver) Events(ctx context.Context) ([]*models.Event, error) {
 	return events, nil
 }
 
-// EventsOrganizers is the resolver for the events_organizers field.
-func (r *queryResolver) EventsOrganizers(ctx context.Context) ([]*models.EventOrganizer, error) {
-	eventsOrganizers, err := r.EventOrganizersRepository.Find()
-	if err != nil {
-		return nil, err
-	}
-	return eventsOrganizers, nil
-}
-
 // EventsRoles is the resolver for the events_roles field.
 func (r *queryResolver) EventsRoles(ctx context.Context) ([]*models.EventRole, error) {
 	eventsRoles, err := r.EventRoleRepository.Find()
@@ -45,6 +36,15 @@ func (r *queryResolver) EventsRoles(ctx context.Context) ([]*models.EventRole, e
 		return nil, err
 	}
 	return eventsRoles, nil
+}
+
+// EventsExpenseCategories is the resolver for the events_expense_categories field.
+func (r *queryResolver) EventsExpenseCategories(ctx context.Context) ([]*models.EventExpenseCategory, error) {
+	categories, err := r.EventExpenseCategoryRepository.Find()
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
 }
 
 // Query returns graph.QueryResolver implementation.

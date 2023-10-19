@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.io/anilk/crane/models"
@@ -28,4 +29,17 @@ func (er *EventExpenseCategoryRepository) FindByID(categoryID int) (*models.Even
 		ScanStruct(&category)
 
 	return &category, err
+}
+
+func (er *EventExpenseCategoryRepository) Find() ([]*models.EventExpenseCategory, error) {
+	var categories []*models.EventExpenseCategory
+
+	err := er.goqu.
+		From(er.GetTableName()).ScanStructs(&categories)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return categories, nil
 }

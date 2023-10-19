@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/doug-martin/goqu/v9"
@@ -19,6 +20,16 @@ func InitEventOrganizersRepository(db *sql.DB, goqu *goqu.Database) *EventOrgani
 
 func (eor *EventOrganizersRepository) GetTableName() string {
 	return "event_organizers"
+}
+
+func (eor *EventOrganizersRepository) FindByID(eventOrganizerId int) (*models.EventOrganizer, error) {
+	var eventOrganizer models.EventOrganizer
+	_, err := eor.goqu.
+		From(eor.GetTableName()).
+		Where(goqu.Ex{"event_organizer_id": eventOrganizerId}).
+		ScanStruct(&eventOrganizer)
+
+	return &eventOrganizer, err
 }
 
 func (eor *EventOrganizersRepository) Find() ([]*models.EventOrganizer, error) {
@@ -40,7 +51,8 @@ func (eor *EventOrganizersRepository) Insert(newEventOrganizer models.NewEventOr
 	).Executor().Exec()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return false, errors.New("could not add event organizer")
 	}
 
 	return true, nil
@@ -67,4 +79,17 @@ func (eor *EventOrganizersRepository) GetEventRole(eventId int, userId int) (str
 	_, err = eor.goqu.From("event_roles").Where(goqu.Ex{"role_id": eventOrganizer.RoleID}).ScanStruct(&role)
 
 	return role.RoleName, err
+}
+
+func (eor *EventOrganizersRepository) FindByEventId(eventId int) ([]*models.EventOrganizer, error) {
+	var eventsOrganizers []*models.EventOrganizer
+
+	err := eor.goqu.
+		From(eor.GetTableName()).Where(goqu.Ex{"event_id": eventId}).ScanStructs(&eventsOrganizers)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return eventsOrganizers, nil
 }
